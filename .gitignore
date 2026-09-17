@@ -1,0 +1,74 @@
+# ==============================================================================
+# CrediFair AI - Git Ignore Configuration (App Module)
+# ==============================================================================
+
+# --- Secrets, API Keys & Environment Variables ---
+.env
+.env.*
+*.env
+.streamlit/secrets.toml
+secrets.toml
+*.pem
+*.key
+
+# --- Python Virtual Environments ---
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+pyvenv.cfg
+
+# --- Python Bytecode & Caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Testing & Quality Assurance ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# --- Streamlit Cache & Runtime ---
+.streamlit/
+*.log
+logs/
+
+# --- Sensitive Financial Datasets & Uploaded Ledgers (NDPA 2023 Compliance) ---
+*.csv
+*.tsv
+*.xlsx
+*.parquet
+uploads/
+data/raw/
+
+# --- Serialized Models & Large Binaries ---
+*.pkl
+*.pickle
+*.joblib
+
+# --- Editor & OS Metadata ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Scratch & Agent Files ---
+.agents/
+check_imports.py
+phase1_selfcheck.py
+check_*.py
+scratch/
+*.tmp
