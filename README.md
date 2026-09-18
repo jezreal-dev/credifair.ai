@@ -1,183 +1,255 @@
-# 🛡️ CrediFair AI (`credifair.ai`)
+# CrediFair AI: Algorithmic Credit Underwriting for Nigerian MSMEs
 
-> **Statistically calibrated, explainable credit underwriting pipeline for Nigerian micro, small, and medium enterprises (MSMEs).**
-
-[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![FastAPI](https://img.shields.io/badge/FastAPI-v2.0-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Conformal Prediction](https://img.shields.io/badge/MAPIE-Conformal%2095%25-green.svg)](https://mapie.readthedocs.io/)
-[![Compliance](https://img.shields.io/badge/NDPA%202023-%C2%A737%20Compliant-success.svg)](https://ndpc.gov.ng/)
-[![Tests](https://img.shields.io/badge/pytest-19%20passed-brightgreen.svg)]()
+Statistically calibrated, distribution-free conformal risk engine and statutory decision-support pipeline for underserved micro, small, and medium enterprises.
 
 ---
 
-## Technical Overview
+## 1. Submission Resources
 
-Over 90 percent of informal merchants in Nigeria lack formal audited accounts or landed property collateral required by commercial lending frameworks. Traditional point-prediction credit models generate static, overconfident default probabilities that fail to account for cash-flow variance in volatile retail environments.
-
-CrediFair AI ingests raw digital point-of-sale (POS) and commercial bank statements to evaluate credit risk using distribution-free **Inductive Conformal Prediction (ICP)**. Instead of a single risk score, the pipeline generates a statistically valid 95 percent confidence interval:
-
-$$\mathbb{P}\left(Y \in \left[\hat{y}_{\text{lower}}, \hat{y}_{\text{upper}}\right]\right) \ge 1 - \alpha \quad (\alpha = 0.05)$$
-
-The system couples these statistical bounds with a dual-language large language model (LLM) advisory interface and enforces statutory compliance under Section 37 of the **Nigeria Data Protection Act (NDPA) 2023**.
-
----
-
-## Architectural Components
-
-### 1. Statistical Risk Engine (`credifair_engine.py`)
-* **Base Regressor:** Gradient-boosted decision trees (`XGBRegressor`) fitted to transactional vitals, including monthly inflow sums, coefficient of variation, and daily transaction frequency.
-* **Calibration Layer:** `MapieRegressor` implementing split conformal prediction across three partitions (60% train, 20% calibration, 20% test) to ensure data exchangeability.
-* **Guarantees:** Generates finite-sample valid prediction intervals at significance level $\alpha = 0.05$. The upper and lower risk bounds dictate three routing pathways:
-  * **Upper bound $\le$ 20.0%:** Recommended for Approval.
-  * **Upper bound $\le$ 45.0%:** Flagged for Manual Underwriter Review.
-  * **Upper bound $>$ 45.0%:** Recommended for Decline.
-
-### 2. Regulatory Compliance Guard (`credifair_compliance.py`)
-* **Automated Decision Safeguards:** Complies with NDPA 2023 Section 37 by classifying model outputs as advisory recommendations. Solely automated lending decisions are programmatically restricted.
-* **Cryptographic Audit Logs:** Generates a deterministic SHA-256 digital signature over input metrics, bounds, decision status, and officer IDs to produce tamper-evident audit trails.
-* **Data Minimization:** Scans and strips statutory identifiers (Bank Verification Numbers, National Identification Numbers, telephone numbers, and account records) from tabular columns and free-text transaction notes.
-
-### 3. Application Security Controls (`credifair_security.py`)
-* **Payload Constraints:** Enforces a 5 MB upload ceiling to mitigate Denial of Service vectors (CWE-400).
-* **Schema Enforcement:** Requires strict column whitelisting on incoming structured files.
-* **Prompt Hardening:** Filters command-override keywords and structural delimiters to defend against Indirect Prompt Injection (OWASP LLM01) and sensitive data leakage (OWASP LLM06).
-* **Formula Neutralization:** Neutralizes CSV Formula Injection (CWE-1236 / DDE) on exported transaction records.
-
-### 4. Dual-Language Explainability Gateway (`credifair_explainability.py`)
-* **Multi-Provider Support:** Automated routing across Groq Cloud (`Llama-3.3-70b-versatile`), Google Gemini (`Gemini-2.5-flash`), Fireworks AI (`Llama-v3p3-70b-instruct`), or an internal deterministic fallback engine.
-* **Dual Output Formatting:**
-  * **Credit Officer Audit Report:** Formal financial English detailing variance triggers, liquidity indices, and debt-service capacity.
-  * **Merchant Advisory:** Localized Nigerian Pidgin translating financial metrics into operational cash-flow guidance.
-
-### 5. Ingestion and Presentation Interfaces
-* **Ingestion Pipeline (`credifair_ingestion.py` & `credifair_parser.py`):** Ingests unstructured CSV ledgers and PDF exports using `decimal.Decimal` arithmetic with `ROUND_HALF_UP` to eliminate floating-point currency drift.
-* **Forensic Guard (`credifair_forensics.py`):** Identifies round-trip transfers, artificial wash trading, turnover concentration spikes, and velocity deficits.
-* **Headless REST API (`api.py`):** Exposes FastAPI endpoints with Cross-Origin Resource Sharing (CORS) enabled for external web clients (e.g., Lovable React/Tailwind frontends).
-* **Verification Dashboard (`app.py`):** Local Streamlit interface for internal evaluation and audit reviews.
-* **CLI Audit Tool (`run_live_audit.py`):** Command-line verification tool for instant file audits.
+* Track: MIT Open Learning / 3MTT Universal AI Innovation Challenge
+* Project Name: CrediFair AI
+* Repository: https://github.com/jezreal-dev/credifair.ai
+* Live Demonstration: https://github.com/jezreal-dev/credifair.ai
+* Video Walkthrough: [Submission Video Placeholder]
+* Primary Developer: Jezreal Momoh (https://github.com/jezreal-dev)
+* Contact: dev@credifair.ai
 
 ---
 
-## Repository Structure
+## 2. Executive Summary
+
+In Nigeria, formal financial institutions systematically exclude micro, small, and medium enterprises (MSMEs) from unsecured debt facilities due to the absence of audited balance sheets, credit bureau histories, and conventional fixed-asset collateral. Commercial credit assessment engines rely on static scoring models that output overconfident point estimates, penalizing informal merchants whose revenues fluctuate with localized commodity seasonality.
+
+CrediFair AI resolves this credit-rationing failure through distribution-free Inductive Conformal Prediction (ICP). The system ingests raw digital point-of-sale (POS) terminal records and commercial bank transaction statements, scrubs personal identifiers in volatile memory, and computes bounded default probability intervals at a certified 95% confidence level:
+
+$$P(Y \in [\hat{y}_{\text{lower}}, \hat{y}_{\text{upper}}]) \ge 1 - \alpha \quad (\alpha = 0.05)$$
+
+The pipeline bridges predictive mathematics and operational compliance by enforcing human-in-the-loop authorization under Section 37 of the Nigeria Data Protection Act (NDPA) 2023, generating verifiable SHA-256 cryptographic audit manifests, and generating actionable dual-language explainability outputs in formal English and Nigerian Pidgin.
+
+---
+
+## 3. Hackathon Rubric Alignment
+
+### 3.1 Problem and Market Impact
+* Total Addressable Market (TAM): Over 39.6 million MSMEs operate in Nigeria, representing approximately 96% of registered commercial enterprises and contributing over 48% to the national Gross Domestic Product (GDP).
+* Financing Gap: The International Finance Corporation (IFC) and Central Bank of Nigeria (CBN) identify an annual credit gap exceeding $32 billion for formal and informal micro-enterprises.
+* Operational Bottleneck: Over 90% of Nigerian micro-merchants operate via daily cash-inflow channels (such as OPay, Moniepoint, PalmPay, and commercial merchant accounts) rather than formal audited books. Traditional bureau scoring categorizes them as unrateable or subprime, resulting in predatory credit terms or total credit denial.
+* Economic Value: CrediFair AI qualifies solvent, high-velocity informal businesses using cashflow variance and transaction density, establishing an empirical bridge to working-capital facilities.
+
+### 3.2 Technical Rigor and Mathematical Depth
+* Base Predictive Regressor: Gradient-boosted decision trees (`XGBRegressor`) trained on non-mocked transactional indicators (monthly inflow volume, transaction frequency, and coefficient of variation).
+* Inductive Conformal Prediction (ICP): Implemented via `MapieRegressor` to compute non-conformity scores without making parametric distributional assumptions regarding underlying cashflow distributions.
+* Three-Way Partitioning Protocol:
+  * Training Split (60%): Optimizes base regressor parameter weights.
+  * Calibration Split (20%): Computes non-conformity residuals to establish exact conformal quantile thresholds ($q_{\text{val}}$) while preserving exchangeability.
+  * Holdout Evaluation Split (20%): Evaluates empirical marginal coverage guarantees on unseen merchant data.
+* Finite-Sample Statistical Coverage: Guarantees finite-sample coverage at significance level $\alpha = 0.05$:
+  * If empirical coverage drops below 95%, interval widths expand automatically to account for high revenue volatility.
+  * Eliminates false certainty from single-point default probabilities.
+
+### 3.3 Responsible AI, Regulatory Compliance, and Security
+* NDPA 2023 Section 37 Statutory Mandate: Purely automated credit granting is programmatically blocked. Model outputs function strictly as decision-support indicators. Final approval or decline requires a designated loan officer to review metrics and submit supervisory sign-off.
+* Cryptographic Audit Logs: Every loan evaluation generates a canonical RFC 8785 JSON manifest sealed with a SHA-256 digest encompassing applicant metrics, conformal intervals, underwriting recommendation, officer credential, and UTC timestamp.
+* In-Memory PII Scrubbing (NDPA 2023 Section 24): Ingestion pipelines run regex scrubbers in volatile memory prior to feature computation or model evaluation, stripping 11-digit Bank Verification Numbers (BVN), National Identification Numbers (NIN), telephone numbers, and email addresses. Raw customer identifiers are never saved to disk or transmitted to language models.
+* Application Security Hardening:
+  * Resource Depletion Defense (CWE-400): Maximum 5MB payload ceiling enforced at the API gateway layer.
+  * CSV Injection Prevention (CWE-1236): Strips executable formula triggers (`=`, `+`, `-`, `@`, `|`) from ledger export files.
+  * Prompt Injection Filtering (OWASP LLM01): Strips prompt-override delimiters and instruction injections before external LLM calls.
+* Forensic Pattern Integrity: Transaction analysis module inspects ledgers for artificial round-sum clustering, wash trading, two-day turnover concentration spikes (>65% volume), and dormancy velocity deficits.
+
+### 3.4 Usability, Explainability, and Localization
+* Dual Output Formatting:
+  * Credit Officer Audit Report (Formal English): Explicit financial risk profile detailing liquidity ratios, cashflow variance, debt-service coverage, and conformal interval interpretation.
+  * Merchant Advisory (Nigerian Pidgin): Actionable vernacular translation breaking down turnover realities, seasonal volatility, and debt-servicing limits without financial jargon.
+* Actionable Recourse: Rather than issuing uninformative rejections, adverse explanations explicitly identify the triggering financial vitals (such as turnover drop or excessive withdrawal frequency) and prescribe quantitative improvements required for future qualification.
+
+---
+
+## 4. Architectural Data Flow
+
+![CrediFair AI Architectural Data Flow](assets/architecture_data_flow.svg)
 
 ```text
-credifair-ai/
-├── api.py                      # FastAPI REST endpoints for external clients
-├── app.py                      # Streamlit inspection interface
-├── credifair_compliance.py     # NDPA 2023 Section 37 compliance interceptor & PII scrubber
-├── credifair_engine.py         # XGBoost and MAPIE conformal prediction logic
-├── credifair_explainability.py # Multi-provider LLM explainability router
-├── credifair_forensics.py      # Forensic wash trading & transaction anomaly detector
-├── credifair_ingestion.py      # Decoupled Decimal financial pipeline & feature extraction
-├── credifair_parser.py         # Multi-format CSV and PDF statement parser
-├── credifair_security.py       # Input validation, CWE defenses, and prompt injection filters
-├── run_live_audit.py           # End-to-end CLI statement audit tool
-├── requirements.txt            # Pinned system dependencies
-├── seed_data.py                # Deterministic validation profiles & merchant archetypes
-├── LICENSE                     # Apache License, Version 2.0
-├── .gitignore                  # Git exclude patterns
-└── tests/
-    ├── __init__.py
-    ├── test_credifair.py       # Unit tests for ML bounds, PII sanitization, and security
-    ├── test_forensics.py       # Unit tests for wash trading and volume concentration
-    ├── test_api.py             # Core FastAPI endpoint tests
-    └── test_api_llm.py         # Integration tests for API, CORS, and provider routing
++-----------------------------------------------------------------------------------+
+|                           MERCHANT STATEMENT INGESTION                            |
+|             Raw Commercial Bank or POS Ledger (CSV, TXT, PDF formats)             |
++-----------------------------------------------------------------------------------+
+                                         |
+                                         v
++-----------------------------------------------------------------------------------+
+|                        APPLICATION SECURITY & PRIVACY LAYER                       |
+|  - 5MB Ceiling Check (CWE-400)                                                    |
+|  - In-Memory PII Redaction: BVN, NIN, Phone, Email (NDPA 2023 Section 24)         |
+|  - Formula Neutralization (CWE-1236)                                              |
++-----------------------------------------------------------------------------------+
+                                         |
+                                         v
++-----------------------------------------------------------------------------------+
+|                           FORENSIC AUDIT & FEATURE PIPELINE                       |
+|  - Wash Trading & Round-Trip Cycling Detection                                    |
+|  - Turnover Spike Concentration & Velocity Deficit Checks                         |
+|  - Decimal Arithmetic Feature Extraction (Inflow, Volatility, Velocity)          |
++-----------------------------------------------------------------------------------+
+                                         |
+                                         v
++-----------------------------------------------------------------------------------+
+|                         CONFORMAL RISK ENGINE (MAPIE + XGBOOST)                   |
+|  - 3-Way Split Protocol: 60% Train | 20% Calibration | 20% Test                   |
+|  - Finite-Sample 95% Confidence Interval Calculation (alpha = 0.05)               |
+|  - Deterministic Decision Routing based on Upper Risk Bound                       |
++-----------------------------------------------------------------------------------+
+                                         |
+                    +--------------------+--------------------+
+                    |                                         |
+                    v                                         v
++---------------------------------------+ +-----------------------------------------+
+|     STATUTORY HITL SIGN-OFF GATE      | |   DUAL-LANGUAGE EXPLAINABILITY GATEWAY  |
+|  - Programmatic Automation Lock       | |  - Technical Officer Report (English)   |
+|  - Loan Officer Identification        | |  - Merchant Advisory (Nigerian Pidgin)  |
+|  - RFC 8785 Canonical JSON Manifest   | |  - Root-Cause Drivers & Recourse Steps  |
+|  - SHA-256 Tamper-Evident Hash Seal   | |                                         |
++---------------------------------------+ +-----------------------------------------+
 ```
 
 ---
 
-## Installation and Setup
+## 5. Decision Routing Thresholds
+
+Underwriting recommendations depend strictly on the upper bound ($\hat{y}_{\text{upper}}$) of the 95% conformal prediction interval:
+
+| Conformal Interval Upper Bound | Underwriting Determination | Operational Routing Action |
+| :--- | :--- | :--- |
+| Upper Bound <= 20.0% | Recommended for Approval | Low-risk profile with proven liquidity stability. Eligible for facility origination following supervisory officer sign-off. |
+| 20.0% < Upper Bound <= 45.0% | Flagged for Manual Review | Moderate volatility or limited historical span. Requires officer inspection of supplier receipts or inventory cycles. |
+| Upper Bound > 45.0% | Recommended for Decline | High default risk or pronounced turnover deficit. Generates structured remediation advisory for future re-application. |
+
+---
+
+## 6. Repository Structure
+
+```text
+credifair-ai/
+├── api.py                      # FastAPI REST endpoints for headless clients
+├── app.py                      # Streamlit inspection and underwriting dashboard
+├── credifair_compliance.py     # NDPA Section 37 compliance interceptor and PII scrubber
+├── credifair_engine.py         # XGBoost and MAPIE conformal prediction engine
+├── credifair_explainability.py # Dual-language LLM and deterministic fallback router
+├── credifair_forensics.py      # Forensic wash trading and transaction anomaly detector
+├── credifair_ingestion.py      # Decimal-precision financial parser and feature extractor
+├── credifair_parser.py         # Multi-format CSV and PDF statement parser
+├── credifair_security.py       # Input validation, CWE guards, and prompt sanitizers
+├── run_live_audit.py           # Command-line statement audit tool
+├── seed_data.py                # Generic MSME archetype definitions and legacy test aliases
+├── requirements.txt            # Pinned system dependencies
+├── LICENSE                     # Apache License, Version 2.0
+├── .gitignore                  # Git exclude specifications
+└── tests/
+    ├── __init__.py
+    ├── test_credifair.py       # Unit tests for ML coverage, PII redaction, and precision
+    ├── test_forensics.py       # Unit tests for wash trading and volume spikes
+    ├── test_api.py             # FastAPI client endpoint and sign-off tests
+    └── test_api_llm.py         # Tests for provider fallback, CORS, and upload limits
+```
+
+---
+
+## 7. Installation and Quickstart
 
 ### Prerequisites
-* **Operating System:** Linux or WSL2 (Ubuntu recommended)
-* **Python Version:** Python 3.10 to Python 3.12
+* Operating System: Linux or Windows Subsystem for Linux (WSL2 Ubuntu)
+* Python Environment: Python 3.10, 3.11, or 3.12
 
-### Step 1: Clone Repository and Prepare Virtual Environment
+### Step 1: Environment Setup
 ```bash
 git clone https://github.com/jezreal-dev/credifair.ai.git
-cd credifair.ai
+cd credifair-ai
 
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 ```
 
-### Step 2: Install Dependencies
+### Step 2: Dependency Installation
 ```bash
 pip install --no-cache-dir -r requirements.txt
 ```
 
-### Step 3: Configure Environment Variables
-Create a `.env` file in the project root:
-
-```ini
-GROQ_API_KEY=your_groq_key_here
-GEMINI_API_KEY=your_gemini_key_here
-FIREWORKS_API_KEY=your_fireworks_key_here
+### Step 3: API Key Configuration (Optional)
+Configure an environment file for live cloud language model routing:
+```bash
+cat << 'EOF' > .env
+GROQ_API_KEY=your_groq_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+FIREWORKS_API_KEY=your_fireworks_api_key_here
+EOF
 ```
+*Note: If API keys are omitted, the engine defaults automatically to internal deterministic rule-based explanations with zero service interruption.*
 
-*Note: If no API keys are provided, the system defaults automatically to the deterministic offline explanation engine.*
+### Step 4: Launch Services
 
----
-
-## Usage
-
-### Run the FastAPI Server (Headless Mode)
-Use this mode to serve external web frontends such as Lovable (React / Tailwind):
-
+* Launch Headless FastAPI REST Server:
 ```bash
 uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
+Interactive API documentation is accessible at `http://localhost:8000/docs`.
 
-* **Interactive API Documentation:** http://localhost:8000/docs
-* **Health Check Probe:** http://localhost:8000/api/v1/health
-
-### Run the Streamlit Dashboard (Internal Review)
-Use this mode to inspect the pipeline locally:
-
+* Launch Streamlit Verification Dashboard:
 ```bash
 streamlit run app.py
 ```
+Dashboard is accessible at `http://localhost:8501`.
 
-Access the application at `http://localhost:8501`.
-
-### Run a Live Statement Audit via CLI
+* Execute Live CLI Statement Audit:
 ```bash
 python run_live_audit.py --file sample_bodija_market_statement.csv --merchant-name "Bodija Retail Archetype"
 ```
 
 ---
 
-## Automated Testing
+## 8. Verified Test Suite Output
 
-Execute the test suite to verify statistical monotonicity, conformal coverage, PII redaction, file upload constraints, and API status codes:
+Execution of automated unit and integration tests confirming full verification across statistical coverage, API contracts, security sanitization, and forensics:
 
-```bash
-pytest tests/ -v
+```text
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /home/jmomoh/credifair_ai/credifair-ai
+plugins: anyio-4.15.1
+collected 19 items
+
+tests/test_api.py::test_health_endpoint PASSED                           [  5%]
+tests/test_api.py::test_profiles_endpoint PASSED                         [ 10%]
+tests/test_api.py::test_assess_profile_endpoint PASSED                   [ 15%]
+tests/test_api.py::test_analyze_endpoint_with_csv PASSED                 [ 21%]
+tests/test_api.py::test_sign_off_endpoint PASSED                         [ 26%]
+tests/test_api_llm.py::test_health_check_and_secret_isolation PASSED     [ 31%]
+tests/test_api_llm.py::test_cors_headers_present PASSED                  [ 36%]
+tests/test_api_llm.py::test_dual_language_format_and_offline_fallback PASSED [ 42%]
+tests/test_api_llm.py::test_appsec_file_upload_limit PASSED              [ 47%]
+tests/test_credifair.py::test_conformal_engine_coverage_and_archetype_decisions PASSED [ 52%]
+tests/test_credifair.py::test_conformal_interval_elasticity PASSED       [ 57%]
+tests/test_credifair.py::test_zerodivisionerror_defensive_handling PASSED [ 63%]
+tests/test_credifair.py::test_deep_pii_redaction_in_text_descriptions PASSED [ 68%]
+tests/test_credifair.py::test_currency_decimal_precision_no_float_drift PASSED [ 73%]
+tests/test_credifair.py::test_security_csv_validation_and_injection_filter PASSED [ 78%]
+tests/test_forensics.py::test_clean_retail_ledger_passes_forensics PASSED [ 84%]
+tests/test_forensics.py::test_round_trip_wash_trading_detection PASSED   [ 89%]
+tests/test_forensics.py::test_turnover_spike_anomaly_detection PASSED    [ 94%]
+tests/test_forensics.py::test_api_integration_preserves_contract PASSED  [100%]
+
+======================== 19 passed, 1 warning in 5.63s =========================
 ```
 
 ---
 
-## Compliance and Security Standards
+## 9. Standards and Licensing
 
-This project implements technical controls aligned with the following frameworks:
-
-* **NDPA 2023 Section 37:** Prohibition of solely automated profiling decisions without human underwriter intervention.
-* **NDPA 2023 Section 24:** Principles of personal data processing, data minimization, and indirect identifier masking.
-* **NITDA Ethical AI Principles:** Traceability, model interpretability, and algorithmic accountability.
-* **OWASP Top 10:** CWE-400 (Resource Exhaustion / 5MB ceiling), CWE-434 (Unrestricted File Upload), and CWE-1236 (CSV Formula Injection).
-* **OWASP Top 10 for LLM Applications:** Mitigation of LLM01 (Prompt Injection) and LLM06 (Sensitive Information Disclosure).
-
----
-
-## License
-
-Licensed under the Apache License, Version 2.0. Refer to the [LICENSE](LICENSE) file for terms and conditions.
-
----
-
-## Author & Attribution
-* **Lead Developer:** Jezreal Momoh ([@jezreal-dev](https://github.com/jezreal-dev))
-* **Project:** CrediFair AI (`credifair.ai`)
-* **Track:** MIT Open Learning / 3MTT Universal AI Innovation Challenge
+* Regulatory Frameworks:
+  * Nigeria Data Protection Act (NDPA) 2023: Section 37 (Automated Decisions) and Section 24 (Data Minimization).
+  * National Information Technology Development Agency (NITDA): Ethical Artificial Intelligence Principles.
+* Application Security Frameworks:
+  * OWASP Top 10: CWE-400 (Denial of Service), CWE-434 (Unrestricted Upload), CWE-1236 (Formula Injection).
+  * OWASP LLM Top 10: Mitigation of LLM01 (Prompt Injection) and LLM06 (Sensitive Information Disclosure).
+* Cryptographic Specifications: Canonical JSON formatting per RFC 8785, cryptographic digests per FIPS 180-4 (SHA-256).
+* License: Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for full legal text.

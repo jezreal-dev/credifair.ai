@@ -1,0 +1,332 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 960" width="100%" height="100%">
+  <defs>
+    <!-- Background Canvas Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070a13" />
+      <stop offset="50%" stop-color="#0b1120" />
+      <stop offset="100%" stop-color="#070a13" />
+    </linearGradient>
+
+    <!-- Node Surface Gradients -->
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#151e32" />
+      <stop offset="100%" stop-color="#0d1424" />
+    </linearGradient>
+
+    <!-- Accent Gradients for Node Accents -->
+    <linearGradient id="ingestionAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+
+    <linearGradient id="securityAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#34d399" />
+    </linearGradient>
+
+    <linearGradient id="forensicsAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+
+    <linearGradient id="conformalAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </linearGradient>
+
+    <linearGradient id="hitlAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0d9488" />
+      <stop offset="100%" stop-color="#2dd4bf" />
+    </linearGradient>
+
+    <linearGradient id="explainAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#a78bfa" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="strongGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur1" />
+      <feGaussianBlur stdDeviation="2" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur1" />
+        <feMergeNode in="blur2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Subtle Grid Pattern -->
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1e293b" stroke-width="0.75" stroke-opacity="0.4" />
+    </pattern>
+
+    <!-- Style block with Keyframe Motion Graphics -->
+    <style>
+      .title-text { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 700; }
+      .body-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      
+      @keyframes dashFlow {
+        from { stroke-dashoffset: 40; }
+        to { stroke-dashoffset: 0; }
+      }
+
+      @keyframes pulseLight {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.85; }
+      }
+
+      @keyframes badgePulse {
+        0%, 100% { transform: scale(1); opacity: 0.9; }
+        50% { transform: scale(1.03); opacity: 1; }
+      }
+
+      .flow-wire {
+        stroke-dasharray: 6 6;
+        animation: dashFlow 1.2s linear infinite;
+      }
+
+      .beacon-ring {
+        animation: pulseLight 2s ease-in-out infinite;
+      }
+    </style>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="900" height="960" fill="url(#bgGrad)" />
+  <rect width="900" height="960" fill="url(#grid)" />
+
+  <!-- Outer Header Title -->
+  <g transform="translate(450, 28)">
+    <text text-anchor="middle" fill="#f8fafc" class="title-text" font-size="14" letter-spacing="3">CREDIFAIR AI : ARCHITECTURAL DATA FLOW</text>
+    <text text-anchor="middle" fill="#64748b" class="body-text" font-size="11" y="16">Statutory Decision Support and Conformal Prediction Pipeline</text>
+  </g>
+
+  <!-- ==================== CONNECTOR PATHS (DRAWN FIRST SO CARDS SIT ON TOP) ==================== -->
+  <!-- Wire 1: Ingestion -> Security -->
+  <path id="path1" d="M 450 155 L 450 205" fill="none" stroke="#1e293b" stroke-width="3" />
+  <path d="M 450 155 L 450 205" fill="none" stroke="#38bdf8" stroke-width="2" class="flow-wire" stroke-opacity="0.8" />
+
+  <!-- Wire 2: Security -> Forensics -->
+  <path id="path2" d="M 450 320 L 450 370" fill="none" stroke="#1e293b" stroke-width="3" />
+  <path d="M 450 320 L 450 370" fill="none" stroke="#34d399" stroke-width="2" class="flow-wire" stroke-opacity="0.8" />
+
+  <!-- Wire 3: Forensics -> Conformal -->
+  <path id="path3" d="M 450 485 L 450 535" fill="none" stroke="#1e293b" stroke-width="3" />
+  <path d="M 450 485 L 450 535" fill="none" stroke="#fbbf24" stroke-width="2" class="flow-wire" stroke-opacity="0.8" />
+
+  <!-- Wire 4A: Conformal -> HITL Gate (Branch Left) -->
+  <path id="path4a" d="M 450 655 L 450 690 C 450 715, 252 715, 252 745" fill="none" stroke="#1e293b" stroke-width="3" />
+  <path d="M 450 655 L 450 690 C 450 715, 252 715, 252 745" fill="none" stroke="#2dd4bf" stroke-width="2" class="flow-wire" stroke-opacity="0.8" />
+
+  <!-- Wire 4B: Conformal -> Explainability (Branch Right) -->
+  <path id="path4b" d="M 450 655 L 450 690 C 450 715, 648 715, 648 745" fill="none" stroke="#1e293b" stroke-width="3" />
+  <path d="M 450 655 L 450 690 C 450 715, 648 715, 648 745" fill="none" stroke="#a78bfa" stroke-width="2" class="flow-wire" stroke-opacity="0.8" />
+
+  <!-- ==================== ANIMATED PACKETS (MOTION GRAPHICS) ==================== -->
+  <!-- Packet 1 Stream -->
+  <circle r="4" fill="#38bdf8" filter="url(#glow)">
+    <animateMotion dur="1s" repeatCount="indefinite" path="M 450 155 L 450 205" />
+  </circle>
+  <circle r="3" fill="#ffffff">
+    <animateMotion dur="1s" repeatCount="indefinite" path="M 450 155 L 450 205" />
+  </circle>
+
+  <!-- Packet 2 Stream -->
+  <circle r="4" fill="#34d399" filter="url(#glow)">
+    <animateMotion dur="1s" repeatCount="indefinite" path="M 450 320 L 450 370" />
+  </circle>
+  <circle r="3" fill="#ffffff">
+    <animateMotion dur="1s" repeatCount="indefinite" path="M 450 320 L 450 370" />
+  </circle>
+
+  <!-- Packet 3 Stream -->
+  <circle r="4" fill="#fbbf24" filter="url(#glow)">
+    <animateMotion dur="1s" repeatCount="indefinite" path="M 450 485 L 450 535" />
+  </circle>
+  <circle r="3" fill="#ffffff">
+    <animateMotion dur="1s" repeatCount="indefinite" path="M 450 485 L 450 535" />
+  </circle>
+
+  <!-- Packet 4A Stream (Left Branch) -->
+  <circle r="4" fill="#2dd4bf" filter="url(#glow)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" path="M 450 655 L 450 690 C 450 715, 252 715, 252 745" />
+  </circle>
+  <circle r="3" fill="#ffffff">
+    <animateMotion dur="1.5s" repeatCount="indefinite" path="M 450 655 L 450 690 C 450 715, 252 715, 252 745" />
+  </circle>
+
+  <!-- Packet 4B Stream (Right Branch) -->
+  <circle r="4" fill="#a78bfa" filter="url(#glow)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" path="M 450 655 L 450 690 C 450 715, 648 715, 648 745" />
+  </circle>
+  <circle r="3" fill="#ffffff">
+    <animateMotion dur="1.5s" repeatCount="indefinite" path="M 450 655 L 450 690 C 450 715, 648 715, 648 745" />
+  </circle>
+
+  <!-- Beacons on Ingestion/Exit Nodes -->
+  <circle cx="450" cy="205" r="4" fill="#38bdf8" />
+  <circle cx="450" cy="205" r="8" fill="none" stroke="#38bdf8" stroke-width="1.5" class="beacon-ring" />
+
+  <circle cx="450" cy="370" r="4" fill="#34d399" />
+  <circle cx="450" cy="370" r="8" fill="none" stroke="#34d399" stroke-width="1.5" class="beacon-ring" />
+
+  <circle cx="450" cy="535" r="4" fill="#fbbf24" />
+  <circle cx="450" cy="535" r="8" fill="none" stroke="#fbbf24" stroke-width="1.5" class="beacon-ring" />
+
+  <circle cx="252" cy="745" r="4" fill="#2dd4bf" />
+  <circle cx="252" cy="745" r="8" fill="none" stroke="#2dd4bf" stroke-width="1.5" class="beacon-ring" />
+
+  <circle cx="648" cy="745" r="4" fill="#a78bfa" />
+  <circle cx="648" cy="745" r="8" fill="none" stroke="#a78bfa" stroke-width="1.5" class="beacon-ring" />
+
+
+  <!-- ==================== NODE 1: INGESTION LAYER ==================== -->
+  <g transform="translate(80, 60)">
+    <rect width="740" height="95" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" />
+    <rect width="740" height="4" rx="2" fill="url(#ingestionAccent)" />
+    
+    <!-- Header Row -->
+    <text x="24" y="32" fill="#38bdf8" class="title-text" font-size="12" letter-spacing="1.5">1. MERCHANT STATEMENT INGESTION</text>
+    <rect x="580" y="16" width="136" height="22" rx="11" fill="#0369a1" fill-opacity="0.3" stroke="#0ea5e9" stroke-width="1" />
+    <text x="648" y="31" text-anchor="middle" fill="#7dd3fc" class="title-text" font-size="10">UNSTRUCTURED INGEST</text>
+
+    <!-- Subtitle & Specs -->
+    <text x="24" y="56" fill="#f1f5f9" class="body-text" font-size="13" font-weight="600">Raw Commercial Bank or POS Ledger Ingestion</text>
+    <text x="24" y="76" fill="#94a3b8" class="body-text" font-size="11">Standardized parsing across OPay, Moniepoint, PalmPay, and Nigerian commercial bank exports (CSV, TXT, PDF)</text>
+  </g>
+
+  <!-- ==================== NODE 2: APPSEC & PRIVACY ==================== -->
+  <g transform="translate(80, 205)">
+    <rect width="740" height="115" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" />
+    <rect width="740" height="4" rx="2" fill="url(#securityAccent)" />
+    
+    <!-- Header Row -->
+    <text x="24" y="32" fill="#34d399" class="title-text" font-size="12" letter-spacing="1.5">2. APPLICATION SECURITY AND PRIVACY LAYER</text>
+    <rect x="580" y="16" width="136" height="22" rx="11" fill="#065f46" fill-opacity="0.3" stroke="#10b981" stroke-width="1" />
+    <text x="648" y="31" text-anchor="middle" fill="#a7f3d0" class="title-text" font-size="10">NDPA 2023 SEC 24</text>
+
+    <!-- Bullets -->
+    <g transform="translate(24, 52)">
+      <circle cx="4" cy="4" r="2.5" fill="#34d399" />
+      <text x="16" y="8" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">5MB Payload Ceiling Enforcement:</text>
+      <text x="230" y="8" fill="#94a3b8" class="body-text" font-size="11">Blocks Resource Depletion / DoS vectors (CWE-400)</text>
+
+      <circle cx="4" cy="24" r="2.5" fill="#34d399" />
+      <text x="16" y="28" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">In-Memory PII Minimization:</text>
+      <text x="195" y="28" fill="#94a3b8" class="body-text" font-size="11">Regex scrubbers mask 11-digit BVN, NIN, telephone, and email in volatile RAM</text>
+
+      <circle cx="4" cy="44" r="2.5" fill="#34d399" />
+      <text x="16" y="48" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">CSV Formula Neutralization:</text>
+      <text x="202" y="48" fill="#94a3b8" class="body-text" font-size="11">Prefixes executable injection operators (=, +, -, @, |) to mitigate CWE-1236</text>
+    </g>
+  </g>
+
+  <!-- ==================== NODE 3: FORENSICS & FEATURES ==================== -->
+  <g transform="translate(80, 370)">
+    <rect width="740" height="115" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" />
+    <rect width="740" height="4" rx="2" fill="url(#forensicsAccent)" />
+    
+    <!-- Header Row -->
+    <text x="24" y="32" fill="#fbbf24" class="title-text" font-size="12" letter-spacing="1.5">3. FORENSIC AUDIT AND FEATURE PIPELINE</text>
+    <rect x="580" y="16" width="136" height="22" rx="11" fill="#78350f" fill-opacity="0.3" stroke="#f59e0b" stroke-width="1" />
+    <text x="648" y="31" text-anchor="middle" fill="#fde68a" class="title-text" font-size="10">PATTERN INTEGRITY</text>
+
+    <!-- Bullets -->
+    <g transform="translate(24, 52)">
+      <circle cx="4" cy="4" r="2.5" fill="#fbbf24" />
+      <text x="16" y="8" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Wash Trading Detection:</text>
+      <text x="180" y="8" fill="#94a3b8" class="body-text" font-size="11">Flags circular round-sum transfers cycling across merchant accounts</text>
+
+      <circle cx="4" cy="24" r="2.5" fill="#fbbf24" />
+      <text x="16" y="28" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Volume Spike Concentration:</text>
+      <text x="210" y="28" fill="#94a3b8" class="body-text" font-size="11">Detects abnormal clustering where greater than 65% volume hits within 48 hours</text>
+
+      <circle cx="4" cy="44" r="2.5" fill="#fbbf24" />
+      <text x="16" y="48" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Decimal Empirical Extraction:</text>
+      <text x="215" y="48" fill="#94a3b8" class="body-text" font-size="11">Computes Monthly Inflow, Volatility CV, and Daily Velocity without float drift</text>
+    </g>
+  </g>
+
+  <!-- ==================== NODE 4: CONFORMAL RISK ENGINE ==================== -->
+  <g transform="translate(80, 535)">
+    <rect width="740" height="120" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" />
+    <rect width="740" height="4" rx="2" fill="url(#conformalAccent)" />
+    
+    <!-- Header Row -->
+    <text x="24" y="32" fill="#60a5fa" class="title-text" font-size="12" letter-spacing="1.5">4. CONFORMAL RISK ENGINE (MAPIE + XGBOOST)</text>
+    <rect x="580" y="16" width="136" height="22" rx="11" fill="#1e3a8a" fill-opacity="0.3" stroke="#3b82f6" stroke-width="1" />
+    <text x="648" y="31" text-anchor="middle" fill="#bfdbfe" class="title-text" font-size="10">95% COVERAGE (ALPHA=0.05)</text>
+
+    <!-- Bullets -->
+    <g transform="translate(24, 52)">
+      <circle cx="4" cy="4" r="2.5" fill="#60a5fa" />
+      <text x="16" y="8" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Three-Way Split Protocol:</text>
+      <text x="185" y="8" fill="#94a3b8" class="body-text" font-size="11">60% Training | 20% Calibration | 20% Holdout Test maintaining exchangeability</text>
+
+      <circle cx="4" cy="24" r="2.5" fill="#60a5fa" />
+      <text x="16" y="28" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Finite-Sample Guaranteed Bounds:</text>
+      <text x="242" y="28" fill="#94a3b8" class="body-text" font-size="11">Yields honest confidence interval [Lower Bound to Upper Bound]</text>
+
+      <circle cx="4" cy="44" r="2.5" fill="#60a5fa" />
+      <text x="16" y="48" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Decision Routing Thresholds:</text>
+      <text x="210" y="48" fill="#94a3b8" class="body-text" font-size="11">Approval (Upper &lt;= 20%) | Manual Review (Upper &lt;= 45%) | Decline (Upper &gt; 45%)</text>
+    </g>
+  </g>
+
+  <!-- ==================== NODE 5A: STATUTORY HITL SIGN-OFF GATE (LEFT) ==================== -->
+  <g transform="translate(80, 745)">
+    <rect width="355" height="175" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" />
+    <rect width="355" height="4" rx="2" fill="url(#hitlAccent)" />
+    
+    <!-- Header -->
+    <text x="18" y="28" fill="#2dd4bf" class="title-text" font-size="11" letter-spacing="1">5A. STATUTORY HITL SIGN-OFF</text>
+    <rect x="235" y="14" width="104" height="20" rx="10" fill="#134e4a" fill-opacity="0.3" stroke="#14b8a6" stroke-width="1" />
+    <text x="287" y="28" text-anchor="middle" fill="#99f6e4" class="title-text" font-size="9">NDPA 2023 SEC 37</text>
+
+    <!-- Content -->
+    <g transform="translate(18, 48)">
+      <circle cx="4" cy="4" r="2" fill="#2dd4bf" />
+      <text x="14" y="8" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Programmatic Automation Block:</text>
+      <text x="14" y="24" fill="#94a3b8" class="body-text" font-size="10.5">Automated credit issuance strictly prevented</text>
+
+      <circle cx="4" cy="40" r="2" fill="#2dd4bf" />
+      <text x="14" y="44" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Human Loan Officer Authorization:</text>
+      <text x="14" y="60" fill="#94a3b8" class="body-text" font-size="10.5">Mandatory staff accreditation identification</text>
+
+      <circle cx="4" cy="76" r="2" fill="#2dd4bf" />
+      <text x="14" y="80" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">RFC 8785 Canonical Seal:</text>
+      <text x="14" y="96" fill="#94a3b8" class="body-text" font-size="10.5">Deterministic SHA-256 tamper-evident log</text>
+    </g>
+  </g>
+
+  <!-- ==================== NODE 5B: DUAL-LANGUAGE EXPLAINABILITY (RIGHT) ==================== -->
+  <g transform="translate(465, 745)">
+    <rect width="355" height="175" rx="12" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5" />
+    <rect width="355" height="4" rx="2" fill="url(#explainAccent)" />
+    
+    <!-- Header -->
+    <text x="18" y="28" fill="#a78bfa" class="title-text" font-size="11" letter-spacing="1">5B. EXPLAINABILITY GATEWAY</text>
+    <rect x="235" y="14" width="104" height="20" rx="10" fill="#4c1d95" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="1" />
+    <text x="287" y="28" text-anchor="middle" fill="#ddd6fe" class="title-text" font-size="9">NITDA ETHICAL AI</text>
+
+    <!-- Content -->
+    <g transform="translate(18, 48)">
+      <circle cx="4" cy="4" r="2" fill="#a78bfa" />
+      <text x="14" y="8" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Formal Underwriter Audit Report:</text>
+      <text x="14" y="24" fill="#94a3b8" class="body-text" font-size="10.5">Financial English detailing liquidity indices</text>
+
+      <circle cx="4" cy="40" r="2" fill="#a78bfa" />
+      <text x="14" y="44" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Merchant Advisory (Nigerian Pidgin):</text>
+      <text x="14" y="60" fill="#94a3b8" class="body-text" font-size="10.5">Clear operational guidance without jargon</text>
+
+      <circle cx="4" cy="76" r="2" fill="#a78bfa" />
+      <text x="14" y="80" fill="#e2e8f0" class="body-text" font-size="11" font-weight="600">Structured Adverse Recourse:</text>
+      <text x="14" y="96" fill="#94a3b8" class="body-text" font-size="10.5">Identifies exact metrics for future approval</text>
+    </g>
+  </g>
+</svg>
