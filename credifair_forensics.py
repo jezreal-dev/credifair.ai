@@ -61,7 +61,7 @@ class ForensicRiskGuard:
         if penalty >= 25.0:
             risk_level = "HIGH"
         elif penalty >= 10.0:
-            risk_level = "ELEVATED"
+            risk_level = "MODERATE"
         else:
             risk_level = "CLEAN"
 

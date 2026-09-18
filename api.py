@@ -1,6 +1,6 @@
 """
 CrediFair AI: Headless REST API for Frontend (React / Tailwind & Lovable)
-Provides decoupled endpoints for dynamic statement ingestion, conformal risk assessment,
+Provides decoupled endpoints for automated statement ingestion, conformal risk assessment,
 multi-provider LLM explainability, and NDPA 2023 §37 statutory human sign-off.
 """
 from typing import Dict, Any, List, Optional
@@ -158,7 +158,7 @@ def assess_profile(payload: AssessProfilePayload) -> Dict[str, Any]:
 @app.post("/api/v1/analyze")
 async def analyze_document(file: UploadFile = File(...)) -> Dict[str, Any]:
     """
-    Dynamically ingests CSV or PDF statement, scrubs PII, extracts empirical features,
+    Ingests CSV or PDF statement, scrubs PII, extracts empirical features,
     executes the conformal prediction engine, and generates explainability advice.
     """
     contents = await file.read()
@@ -169,7 +169,7 @@ async def analyze_document(file: UploadFile = File(...)) -> Dict[str, Any]:
     if len(contents) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
-    # Ingestion & Dynamic Parsing
+    # Ingestion & Empirical Parsing
     try:
         filename_lower = (file.filename or "").lower()
         if filename_lower.endswith(".pdf") or contents.startswith(b"%PDF"):

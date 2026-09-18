@@ -12,7 +12,7 @@ import { AlertCircle } from 'lucide-react';
 export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [mode, setMode] = useState<'archetype' | 'upload'>('archetype');
-  const [selectedProfileKey, setSelectedProfileKey] = useState<string>('Mama Bukky Foodstuff (Bodija Market)');
+  const [selectedProfileKey, setSelectedProfileKey] = useState<string>('Bodija Retail Archetype');
   const [loanRequested, setLoanRequested] = useState<number>(750000);
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -57,7 +57,7 @@ export default function App() {
 
   // Initial load
   useEffect(() => {
-    loadArchetype('Mama Bukky Foodstuff (Bodija Market)', 750000);
+    loadArchetype('Bodija Retail Archetype', 750000);
   }, [loadArchetype]);
 
   const handleProfileSelect = (key: string) => {

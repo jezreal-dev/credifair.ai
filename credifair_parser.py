@@ -2,7 +2,7 @@
 CrediFair AI: Real Bank & POS Document Parser
 Parses authentic CSV and PDF statements (OPay, Moniepoint, GTBank, Access, etc.)
 without mock data, extracting real cashflow metrics, daily transaction densities,
-and dynamic volatility values.
+and empirical volatility values.
 """
 import io
 import re
@@ -30,7 +30,7 @@ class RealDocumentParser:
 
     @classmethod
     def parse_csv_file(cls, file_bytes: bytes) -> pd.DataFrame:
-        """Dynamically ingests CSV bank/POS ledgers with fuzzy header matching."""
+        """Ingests CSV bank/POS ledgers with fuzzy header matching."""
         # Try multiple delimiters
         df = None
         for sep in [",", "\t", ";", "|"]:
@@ -110,7 +110,7 @@ class RealDocumentParser:
 
     @classmethod
     def extract_features(cls, df: pd.DataFrame) -> Dict[str, Any]:
-        """Calculates dynamic, non-mocked financial features from authentic transaction ledgers."""
+        """Calculates empirical, non-mocked financial features from authentic transaction ledgers."""
         if df.empty:
             raise ValueError("Empty transaction ledger.")
 

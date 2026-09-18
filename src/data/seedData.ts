@@ -1,31 +1,49 @@
 import { PreloadedProfile, TransactionRecord } from '../types';
 
-export const PRELOADED_PROFILES: Record<string, PreloadedProfile> = {
-  "Mama Bukky Foodstuff (Bodija Market)": {
-    name: "Mama Bukky Foodstuff (Bodija Market)",
+export const PRIMARY_ARCHETYPES: Record<string, PreloadedProfile> = {
+  "Bodija Retail Archetype": {
+    name: "Bodija Retail Archetype",
     monthly_inflow: 1850000,
     volatility: 11.8,
     daily_tx: 48,
     loan_requested: 750000,
     driver: "Consistent daily transaction frequency counteracts localized foodstuff price seasonality.",
-    csv_key: "mama_bukky",
+    csv_key: "bodija_retail",
   },
-  "Emeka Electronics (Alaba Int'l)": {
-    name: "Emeka Electronics (Alaba Int'l)",
+  "Alaba Merchant Archetype": {
+    name: "Alaba Merchant Archetype",
     monthly_inflow: 4200000,
     volatility: 38.4,
     daily_tx: 19,
     loan_requested: 2000000,
     driver: "High cash inflow volume is offset by sharp bi-weekly inventory restocking swings.",
-    csv_key: "emeka_electronics",
+    csv_key: "alaba_merchant",
   },
-  "Baba Musa Textiles (Kano Market)": {
-    name: "Baba Musa Textiles (Kano Market)",
+  "Kano Textile Archetype": {
+    name: "Kano Textile Archetype",
     monthly_inflow: 650000,
     volatility: 54.2,
     daily_tx: 7,
     loan_requested: 400000,
     driver: "Declining daily terminal sales volume with increasing personal liquidity withdrawals.",
+    csv_key: "kano_textile",
+  },
+};
+
+export const ARCHETYPE_PROFILES = PRIMARY_ARCHETYPES;
+
+export const PRELOADED_PROFILES: Record<string, PreloadedProfile> = {
+  ...PRIMARY_ARCHETYPES,
+  "Mama Bukky Foodstuff (Bodija Market)": {
+    ...PRIMARY_ARCHETYPES["Bodija Retail Archetype"],
+    csv_key: "mama_bukky",
+  },
+  "Emeka Electronics (Alaba Int'l)": {
+    ...PRIMARY_ARCHETYPES["Alaba Merchant Archetype"],
+    csv_key: "emeka_electronics",
+  },
+  "Baba Musa Textiles (Kano Market)": {
+    ...PRIMARY_ARCHETYPES["Kano Textile Archetype"],
     csv_key: "baba_musa",
   },
 };
@@ -34,9 +52,9 @@ export function generateMerchantTransactions(merchantProfileKey: string, rows: n
   const baseDate = new Date(2026, 8, 1); // Sept 1, 2026
   const records: TransactionRecord[] = [];
 
-  let runningBalance = merchantProfileKey === 'mama_bukky'
+  let runningBalance = (merchantProfileKey === 'mama_bukky' || merchantProfileKey === 'bodija_retail')
     ? 150000
-    : merchantProfileKey === 'emeka_electronics'
+    : (merchantProfileKey === 'emeka_electronics' || merchantProfileKey === 'alaba_merchant')
       ? 800000
       : 300000;
 
@@ -48,7 +66,7 @@ export function generateMerchantTransactions(merchantProfileKey: string, rows: n
     let amount = 1000;
     let category = "Retail Flow";
 
-    if (merchantProfileKey === 'mama_bukky') {
+    if (merchantProfileKey === 'mama_bukky' || merchantProfileKey === 'bodija_retail') {
       const p = (i * 17 + 7) % 100;
       if (p < 50) amount = 500;
       else if (p < 80) amount = 1200;
@@ -58,7 +76,7 @@ export function generateMerchantTransactions(merchantProfileKey: string, rows: n
       const cats = ["Foodstuff", "Raw Rice", "Vegetables", "Groceries"];
       category = cats[i % cats.length];
       runningBalance += amount * 0.05;
-    } else if (merchantProfileKey === 'emeka_electronics') {
+    } else if (merchantProfileKey === 'emeka_electronics' || merchantProfileKey === 'alaba_merchant') {
       const p = (i * 23 + 11) % 100;
       if (p < 40) amount = 5000;
       else if (p < 60) amount = 250000;
@@ -69,7 +87,7 @@ export function generateMerchantTransactions(merchantProfileKey: string, rows: n
       category = cats[i % cats.length];
       runningBalance += amount * 0.1;
     } else {
-      // baba_musa
+      // kano_textile or baba_musa
       const noise = ((i * 31 + 13) % 40) - 20;
       amount = Math.max(1000, Math.min(50000, 12000 + noise * 400));
       const cats = ["Textile Retail", "Cash Out", "Personal Withdrawal"];

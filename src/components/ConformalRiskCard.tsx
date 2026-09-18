@@ -69,7 +69,7 @@ export const ConformalRiskCard: React.FC<ConformalRiskCardProps> = ({ risk }) =>
         <div className="flex justify-between items-center text-xs text-slate-500 mb-1.5">
           <span>0% (Lowest Risk)</span>
           <span className="font-medium text-slate-700">
-            Honest Interval (α=0.05): [{risk.lower_bound_pct}% — {risk.upper_bound_pct}%]
+            Honest Interval (α=0.05): [{risk.lower_bound_pct}% to {risk.upper_bound_pct}%]
           </span>
           <span>100% (High Risk)</span>
         </div>
@@ -108,7 +108,7 @@ export const ConformalRiskCard: React.FC<ConformalRiskCardProps> = ({ risk }) =>
             </span>
             <span className="inline-flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded bg-amber-200 border border-amber-400 inline-block" />
-              <span>20–45% Review</span>
+              <span>20% to 45% Review</span>
             </span>
             <span className="inline-flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded bg-rose-200 border border-rose-400 inline-block" />

@@ -12,7 +12,7 @@ from credifair_compliance import CrediFairComplianceGuard
 from credifair_security import CrediFairSecurityGuard
 from credifair_explainability import generate_dual_language_explanation
 from credifair_ingestion import FinancialDataPipeline
-from seed_data import PRELOADED_PROFILES, generate_merchant_csv
+from seed_data import PRIMARY_ARCHETYPES, PRELOADED_PROFILES, generate_merchant_csv
 
 st.set_page_config(
     page_title="CrediFair AI | Fair Credit for Nigerian MSMEs",
@@ -28,15 +28,18 @@ def load_ml_engine() -> CrediFairEngine:
 
 engine = load_ml_engine()
 
-st.title("🛡️ CrediFair AI: Fair Alternative Credit Scoring")
-st.caption("Distribution-Free Conformal Risk Engine & NDPA 2023 §37 Compliant Underwriting")
+st.title("🛡️ CrediFair AI: Fair Credit Assessment for Nigerian MSMEs")
+st.markdown("""
+**Distribution-Free Conformal Risk Engine & Statutory Underwriting System.**
+Provides honest uncertainty intervals and transparent Pidgin/English explanations for unbanked micro-merchants.
+""")
 
 # Sidebar
 st.sidebar.header("📁 Merchant Profile Ingestion")
 mode = st.sidebar.radio("Data Ingestion Method:", ["Pre-loaded MSME Archetype", "Upload Raw POS / Bank CSV"])
 
 if mode == "Pre-loaded MSME Archetype":
-    profile_choice = st.sidebar.selectbox("Choose Verified Profile:", list(PRELOADED_PROFILES.keys()))
+    profile_choice = st.sidebar.selectbox("Choose Verified Profile:", list(PRIMARY_ARCHETYPES.keys()))
     preloaded = PRELOADED_PROFILES[profile_choice]
     df_raw = generate_merchant_csv(preloaded["csv_key"])
 
@@ -96,6 +99,7 @@ with col1:
     m3.metric("Daily Tx Count", f"{merchant_profile['daily_tx']}")
 
     st.write("Recent Transaction Activity:")
+    st.caption("🔒 In-Memory PII Scrub Active: Customer phone numbers, BVN, NIN, and account identifiers redacted prior to model ingestion.")
     st.dataframe(df_clean.head(5), use_container_width=True)
 
 # Risk Prediction with Conformal Bounds
@@ -124,7 +128,7 @@ with col2:
         name="Point Estimate"
     ))
     fig.update_layout(
-        title=f"Honest Risk Interval (alpha=0.05): [{risk_results['lower_bound_pct']}% — {risk_results['upper_bound_pct']}%]",
+        title=f"Honest Risk Interval (alpha=0.05): [{risk_results['lower_bound_pct']}% to {risk_results['upper_bound_pct']}%]",
         xaxis=dict(title="Probability of Default (%)", range=[0, 100]),
         height=220,
         margin=dict(l=20, r=20, t=40, b=20)
@@ -161,7 +165,8 @@ else:
 
 st.markdown("---")
 st.subheader("⚖️ Regulatory Compliance & Human Underwriting Sign-Off")
-st.caption("Per NDPA 2023 Section 37, loans cannot be granted via solely automated processing.")
+st.info("🛡️ **NDPA 2023 Section 37**: Solely automated credit decisions strictly prohibited. Human-in-the-Loop underwriting required.")
+st.caption("All automated risk recommendations require auditable human loan officer authorization before execution.")
 
 officer_name = st.text_input("Enter Loan Officer Name / Staff ID for Sign-off:", value="LO-ABUJA-741")
 

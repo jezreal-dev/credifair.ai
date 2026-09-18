@@ -59,8 +59,7 @@ export const ComplianceSignOff: React.FC<ComplianceSignOffProps> = ({ vitals, ri
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Per NDPA 2023 Section 37, credit decisions cannot be executed via solely automated processing without
-            auditable human sign-off.
+            NDPA 2023 Section 37: Solely automated credit decisions strictly prohibited. Human-in-the-Loop underwriting required.
           </p>
         </div>
         <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">

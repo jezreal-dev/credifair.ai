@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Upload, Users, FileSpreadsheet, RefreshCw, CheckCircle2 } from 'lucide-react';
-import { PRELOADED_PROFILES } from '../data/seedData';
+import { ARCHETYPE_PROFILES } from '../data/seedData';
 
 interface ProfileSelectorProps {
   mode: 'archetype' | 'upload';
@@ -85,7 +85,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
 
       {mode === 'archetype' ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {Object.entries(PRELOADED_PROFILES).map(([key, profile]) => {
+          {Object.entries(ARCHETYPE_PROFILES).map(([key, profile]) => {
             const isSelected = selectedProfileKey === key;
             return (
               <button

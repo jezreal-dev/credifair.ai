@@ -1,5 +1,5 @@
 """
-CrediFair AI: Live Statement Audit CLI Harness
+CrediFair AI: Live Statement Audit CLI Runner
 Executes the non-mocked, end-to-end evaluation pipeline on real CSV/PDF bank statements.
 """
 import argparse
@@ -19,7 +19,7 @@ def run_audit(file_path: str, loan_amount: int = 750_000, merchant_name: str = "
         sys.exit(1)
 
     print(f"\n{'='*70}")
-    print(f"CREDIFAIR AI: LIVE STATEMENT AUDIT HARNESS")
+    print(f"CREDIFAIR AI: LIVE STATEMENT AUDIT RUNNER")
     print(f"{'='*70}")
     print(f"Target Document: {file_path}")
     print(f"Applicant Name:  {merchant_name}")
@@ -64,7 +64,7 @@ def run_audit(file_path: str, loan_amount: int = 750_000, merchant_name: str = "
     )
 
     print(f"  • Point Risk of Default:     {risk_results['point_risk_pct']}%")
-    print(f"  • 95% Conformal Bounds:      [{risk_results['lower_bound_pct']}% — {risk_results['upper_bound_pct']}%]")
+    print(f"  • 95% Conformal Bounds:      [{risk_results['lower_bound_pct']}% to {risk_results['upper_bound_pct']}%]")
     print(f"  • Conformal Interval Width:  {risk_results['upper_bound_pct'] - risk_results['lower_bound_pct']:.2f}%")
     print(f"  • Underwriting Decision:     >>> {risk_results['recommendation']} <<<")
     print(f"  • Holdout Empirical Cov:     {risk_results['empirical_calibration_coverage']*100:.1f}%")

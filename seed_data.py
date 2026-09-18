@@ -8,11 +8,11 @@ def generate_merchant_csv(merchant_profile: str, rows: int = 150) -> pd.DataFram
     base_date = datetime(2026, 9, 1)
     dates = [base_date - timedelta(days=i) for i in range(rows)]
     
-    if merchant_profile == "mama_bukky":
+    if merchant_profile in ["mama_bukky", "bodija_retail"]:
         amounts = np.random.choice([500, 1200, 2500, 4000], size=rows, p=[0.5, 0.3, 0.15, 0.05])
         categories = ["Foodstuff", "Raw Rice", "Vegetables", "Groceries"]
         balances = np.cumsum(amounts * 0.05) + 150000
-    elif merchant_profile == "emeka_electronics":
+    elif merchant_profile in ["emeka_electronics", "alaba_merchant"]:
         amounts = np.random.choice([5000, 250000, 12000, 600000], size=rows, p=[0.4, 0.2, 0.3, 0.1])
         categories = ["Phone Accessories", "Stock Purchase", "POS Terminal"]
         balances = np.cumsum(amounts * 0.1) + 800000
@@ -31,29 +31,49 @@ def generate_merchant_csv(merchant_profile: str, rows: int = 150) -> pd.DataFram
     })
     return df
 
-PRELOADED_PROFILES = {
-    "Mama Bukky Foodstuff (Bodija Market)": {
+PRIMARY_ARCHETYPES = {
+    "Bodija Retail Archetype": {
         "monthly_inflow": 1850000,
         "volatility": 11.8,
         "daily_tx": 48,
         "loan_requested": 750000,
         "driver": "Consistent daily transaction frequency counteracts localized foodstuff price seasonality.",
-        "csv_key": "mama_bukky"
+        "csv_key": "bodija_retail"
     },
-    "Emeka Electronics (Alaba Int'l)": {
+    "Alaba Merchant Archetype": {
         "monthly_inflow": 4200000,
         "volatility": 38.4,
         "daily_tx": 19,
         "loan_requested": 2000000,
         "driver": "High cash inflow volume is offset by sharp bi-weekly inventory restocking swings.",
-        "csv_key": "emeka_electronics"
+        "csv_key": "alaba_merchant"
     },
-    "Baba Musa Textiles (Kano Market)": {
+    "Kano Textile Archetype": {
         "monthly_inflow": 650000,
         "volatility": 54.2,
         "daily_tx": 7,
         "loan_requested": 400000,
         "driver": "Declining daily terminal sales volume with increasing personal liquidity withdrawals.",
+        "csv_key": "kano_textile"
+    }
+}
+
+LEGACY_ALIASES = {
+    "Mama Bukky Foodstuff (Bodija Market)": {
+        **PRIMARY_ARCHETYPES["Bodija Retail Archetype"],
+        "csv_key": "mama_bukky"
+    },
+    "Emeka Electronics (Alaba Int'l)": {
+        **PRIMARY_ARCHETYPES["Alaba Merchant Archetype"],
+        "csv_key": "emeka_electronics"
+    },
+    "Baba Musa Textiles (Kano Market)": {
+        **PRIMARY_ARCHETYPES["Kano Textile Archetype"],
         "csv_key": "baba_musa"
     }
+}
+
+PRELOADED_PROFILES = {
+    **PRIMARY_ARCHETYPES,
+    **LEGACY_ALIASES
 }
