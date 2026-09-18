@@ -9,7 +9,7 @@ Statistically calibrated, distribution-free conformal risk engine for underserve
 * **Track**: MIT Open Learning / 3MTT Universal AI Innovation Challenge.
 * **Project Name**: CrediFair AI.
 * **Repository**: https://github.com/jezreal-dev/credifair.ai
-* **Live Demo**: https://github.com/jezreal-dev/credifair.ai
+* **Live Demo**: https://credifair.ai.studio/
 * **Video Walkthrough**: [Submission Video Placeholder].
 * **Developer**: Jezreal Momoh.
 
