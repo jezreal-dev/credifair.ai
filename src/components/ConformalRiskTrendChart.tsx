@@ -130,7 +130,7 @@ export const ConformalRiskTrendChart: React.FC<ConformalRiskTrendChartProps> = (
                         {d.cycle}
                       </div>
                       <div className="text-[#006C51] font-bold">
-                        95% Band: [{d.lower.toFixed(1)}% — {d.upper.toFixed(1)}%]
+                        95% Band: [{d.lower.toFixed(1)}% to {d.upper.toFixed(1)}%]
                       </div>
                       <div className="text-slate-600 mt-0.5">
                         Point Risk: {d.point.toFixed(1)}%

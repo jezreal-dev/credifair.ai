@@ -205,7 +205,7 @@ export const CompliancePage: React.FC = () => {
               <div className="text-xs text-slate-500 flex items-center gap-6 pt-1 flex-wrap font-mono">
                 <span>Point Risk: <strong className="text-[#210F60] font-bold">{m.conformal_metrics.point_risk_pct}%</strong></span>
                 <span>
-                  95% Interval: <strong className="text-[#006C51] font-bold">[{m.conformal_metrics.confidence_interval_95[0]}% — {m.conformal_metrics.confidence_interval_95[1]}%]</strong>
+                  95% Interval: <strong className="text-[#006C51] font-bold">[{m.conformal_metrics.confidence_interval_95[0]}% to {m.conformal_metrics.confidence_interval_95[1]}%]</strong>
                 </span>
                 <span>Solely Automated: <strong className="text-rose-600 font-bold">FALSE (Section 37 Compliant)</strong></span>
               </div>
