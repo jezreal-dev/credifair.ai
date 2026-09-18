@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 from pypdf import PdfReader
 from credifair_compliance import CrediFairComplianceGuard
+from credifair_forensics import ForensicRiskGuard
 
 
 class RealDocumentParser:
@@ -120,9 +121,12 @@ class RealDocumentParser:
         std_amt = float(np.std(amounts_float)) if len(amounts_float) > 1 else 0.0
 
         volatility = (std_amt / mean_amt * 100.0) if mean_amt > 0 else 50.0
-        volatility = float(np.clip(volatility, 5.0, 95.0))
 
-        active_days = max(1, df["date"].nunique())
+        # Forensic Transaction Analysis & Volatility Penalty Adjustment
+        forensics = ForensicRiskGuard.analyze_ledger_forensics(df)
+        adjusted_volatility = float(np.clip(volatility + forensics["risk_penalty_points"], 5.0, 95.0))
+
+        active_days = max(1, df["date"].nunique()) if "date" in df.columns else 1
         daily_tx = max(1, len(df) // active_days)
 
         seed = f"{len(df)}_{total_inflow}_{active_days}".encode()
@@ -132,12 +136,13 @@ class RealDocumentParser:
             "merchant_id": merchant_id,
             "monthly_inflow": float(total_inflow),
             "monthly_inflow_formatted": f"₦{total_inflow:,.2f}",
-            "volatility": round(volatility, 1),
+            "volatility": round(adjusted_volatility, 1),
             "daily_tx": daily_tx,
             "loan_requested": int(float(total_inflow) * 0.35),
             "total_records": len(df),
             "active_days": active_days,
-            "driver": f"Extracted from {len(df)} authentic records across {active_days} business days."
+            "driver": f"Extracted from {len(df)} authentic records across {active_days} business days.",
+            "forensic_audit": forensics
         }
 
     @classmethod

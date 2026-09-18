@@ -13,6 +13,7 @@ from credifair_engine import CrediFairEngine
 from credifair_compliance import CrediFairComplianceGuard
 from credifair_security import CrediFairSecurityGuard
 from credifair_explainability import get_active_llm_provider, generate_dual_language_explanation
+from credifair_forensics import ForensicRiskGuard
 from seed_data import PRELOADED_PROFILES, generate_merchant_csv
 
 app = FastAPI(title="CrediFair AI Engine API", version="2.0.0")
@@ -100,6 +101,8 @@ def assess_profile(payload: AssessProfilePayload) -> Dict[str, Any]:
     volatility = float(profile["volatility"])
     daily_tx = float(profile["daily_tx"])
 
+    forensics = ForensicRiskGuard.analyze_ledger_forensics(df_clean)
+
     # Conformal Risk Assessment
     risk = engine.predict_risk_band(
         monthly_inflow=monthly_inflow,
@@ -128,23 +131,27 @@ def assess_profile(payload: AssessProfilePayload) -> Dict[str, Any]:
             "balance": float(row.get("balance", 0.0))
         })
 
+    merchant_vitals = {
+        "merchant_id": f"MERCH-{csv_key.upper()[:6]}",
+        "merchant_name": profile_key,
+        "monthly_inflow": monthly_inflow,
+        "monthly_inflow_formatted": f"₦{monthly_inflow:,.2f}",
+        "volatility": volatility,
+        "daily_tx": daily_tx,
+        "loan_requested": loan_req,
+        "total_records": len(df),
+        "active_days": 30,
+        "driver": profile["driver"],
+        "forensic_audit": forensics
+    }
+
     return {
         "status": "success",
-        "merchant_vitals": {
-            "merchant_id": f"MERCH-{csv_key.upper()[:6]}",
-            "merchant_name": profile_key,
-            "monthly_inflow": monthly_inflow,
-            "monthly_inflow_formatted": f"₦{monthly_inflow:,.2f}",
-            "volatility": volatility,
-            "daily_tx": daily_tx,
-            "loan_requested": loan_req,
-            "total_records": len(df),
-            "active_days": 30,
-            "driver": profile["driver"]
-        },
+        "merchant_vitals": merchant_vitals,
         "conformal_risk": risk,
         "llm_explanation": explanation,
-        "sample_records": sample_records
+        "sample_records": sample_records,
+        "forensic_audit": forensics
     }
 
 
@@ -177,7 +184,7 @@ async def analyze_document(file: UploadFile = File(...)) -> Dict[str, Any]:
     # Compliance Layer: Deep PII Sanitization
     df_clean = CrediFairComplianceGuard.sanitize_merchant_dataframe(df)
 
-    # Real Feature Calculation
+    # Real Feature Calculation (includes forensic audit & volatility adjustment)
     features = RealDocumentParser.extract_features(df_clean)
 
     # Conformal Risk Assessment
@@ -211,7 +218,8 @@ async def analyze_document(file: UploadFile = File(...)) -> Dict[str, Any]:
         "merchant_vitals": features,
         "conformal_risk": risk,
         "llm_explanation": explanation,
-        "sample_records": sample_records
+        "sample_records": sample_records,
+        "forensic_audit": features["forensic_audit"]
     }
 
 
