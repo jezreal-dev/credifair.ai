@@ -69,47 +69,6 @@ The pipeline bridges predictive mathematics and operational compliance by enforc
 
 ![CrediFair AI Architectural Data Flow](assets/architecture_data_flow.svg)
 
-```text
-+-----------------------------------------------------------------------------------+
-|                           MERCHANT STATEMENT INGESTION                            |
-|             Raw Commercial Bank or POS Ledger (CSV, TXT, PDF formats)             |
-+-----------------------------------------------------------------------------------+
-                                         |
-                                         v
-+-----------------------------------------------------------------------------------+
-|                        APPLICATION SECURITY & PRIVACY LAYER                       |
-|  - 5MB Ceiling Check (CWE-400)                                                    |
-|  - In-Memory PII Redaction: BVN, NIN, Phone, Email (NDPA 2023 Section 24)         |
-|  - Formula Neutralization (CWE-1236)                                              |
-+-----------------------------------------------------------------------------------+
-                                         |
-                                         v
-+-----------------------------------------------------------------------------------+
-|                           FORENSIC AUDIT & FEATURE PIPELINE                       |
-|  - Wash Trading & Round-Trip Cycling Detection                                    |
-|  - Turnover Spike Concentration & Velocity Deficit Checks                         |
-|  - Decimal Arithmetic Feature Extraction (Inflow, Volatility, Velocity)          |
-+-----------------------------------------------------------------------------------+
-                                         |
-                                         v
-+-----------------------------------------------------------------------------------+
-|                         CONFORMAL RISK ENGINE (MAPIE + XGBOOST)                   |
-|  - 3-Way Split Protocol: 60% Train | 20% Calibration | 20% Test                   |
-|  - Finite-Sample 95% Confidence Interval Calculation (alpha = 0.05)               |
-|  - Deterministic Decision Routing based on Upper Risk Bound                       |
-+-----------------------------------------------------------------------------------+
-                                         |
-                    +--------------------+--------------------+
-                    |                                         |
-                    v                                         v
-+---------------------------------------+ +-----------------------------------------+
-|     STATUTORY HITL SIGN-OFF GATE      | |   DUAL-LANGUAGE EXPLAINABILITY GATEWAY  |
-|  - Programmatic Automation Lock       | |  - Technical Officer Report (English)   |
-|  - Loan Officer Identification        | |  - Merchant Advisory (Nigerian Pidgin)  |
-|  - RFC 8785 Canonical JSON Manifest   | |  - Root-Cause Drivers & Recourse Steps  |
-|  - SHA-256 Tamper-Evident Hash Seal   | |                                         |
-+---------------------------------------+ +-----------------------------------------+
-```
 
 ---
 
