@@ -25,6 +25,7 @@ import {
   FileDown,
 } from 'lucide-react';
 import { BrandLogo } from '../components/BrandLogo';
+import { Footer } from '../components/Footer';
 import { generateOperationalPdfReport } from '../utils/generatePdfReport';
 
 export const LandingPage: React.FC = () => {
@@ -515,26 +516,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 5. FOOTER */}
-      <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 text-xs text-slate-500 border-t border-slate-200 mt-16">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-8">
-          <BrandLogo size={32} />
-          <div className="flex items-center gap-6 text-slate-600 font-medium">
-            <Link to="/" className="hover:text-[#1DCF9F] transition-colors">Home</Link>
-            <Link to="/app" className="hover:text-[#1DCF9F] transition-colors">Studio</Link>
-            <Link to="/ledger" className="hover:text-[#1DCF9F] transition-colors">Sanitized Ledger</Link>
-            <Link to="/compliance" className="hover:text-[#1DCF9F] transition-colors">Compliance Vault</Link>
-          </div>
-        </div>
-
-        <div className="border-t border-slate-100 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
-          <div>
-            © {new Date().getFullYear()} CrediFair AI. Built for fair, collateral-free credit underwriting.
-          </div>
-          <div>
-            Empirical Conformal Prediction • Finite-Sample Coverage
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
