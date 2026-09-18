@@ -2,8 +2,13 @@
 
 @layer base {
   body {
-    background-color: #f8fafc;
-    color: #0f172a;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-color: #0B0E14;
+    color: #F1F5F9;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+    letter-spacing: -0.01em;
   }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }

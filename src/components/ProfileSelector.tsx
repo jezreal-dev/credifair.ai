@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Upload, Users, FileSpreadsheet, RefreshCw, CheckCircle2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Upload, Users, FileSpreadsheet, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { PRELOADED_PROFILES } from '../data/seedData';
 
 interface ProfileSelectorProps {
@@ -23,163 +23,189 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
   onFileUpload,
   isLoading,
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      onFileUpload(e.dataTransfer.files[0]);
+      validateAndUpload(e.dataTransfer.files[0]);
     }
+  };
+
+  const validateAndUpload = (file: File) => {
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(`File size exceeds 5MB ceiling (${(file.size / 1024 / 1024).toFixed(2)} MB). Please upload a smaller file.`);
+      return;
+    }
+    onFileUpload(file);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      onFileUpload(e.target.files[0]);
+      validateAndUpload(e.target.files[0]);
     }
   };
 
   return (
-    <div id="profile-selector-panel" className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+    <div
+      id="profile-selector-panel"
+      className="bg-[#121824] rounded-xl border border-slate-800/80 p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:bg-slate-900 shadow-xs"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-800/80">
         <div>
-          <h2 className="text-base font-semibold text-slate-900">1. Merchant Ingestion &amp; Profile</h2>
-          <p className="text-xs text-slate-500">
-            Select an authentic Nigerian market profile or ingest a raw bank/POS statement
+          <h2 className="text-sm font-semibold text-slate-100 tracking-tight">
+            1. Merchant Ingestion &amp; Statement Selection
+          </h2>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">
+            Select an authentic Nigerian market profile or ingest a raw bank or POS statement
           </p>
         </div>
 
-        {/* Tab switch */}
-        <div className="inline-flex rounded-lg p-1 bg-slate-100 border border-slate-200 text-xs font-medium self-start sm:self-auto">
+        {/* Modern Segmented Control */}
+        <div className="inline-flex p-1 rounded-lg bg-slate-950 border border-slate-800 self-start sm:self-auto">
           <button
-            id="tab-archetype"
             type="button"
             onClick={() => onModeChange('archetype')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono font-medium transition-all ${
               mode === 'archetype'
-                ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-800 text-slate-100 border border-slate-700/80 shadow-xs'
+                : 'text-slate-400 hover:text-slate-200 border border-transparent'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Pre-loaded Archetypes</span>
+            <span>Verified Archetypes</span>
           </button>
           <button
-            id="tab-upload"
             type="button"
             onClick={() => onModeChange('upload')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono font-medium transition-all ${
               mode === 'upload'
-                ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-slate-800 text-slate-100 border border-slate-700/80 shadow-xs'
+                : 'text-slate-400 hover:text-slate-200 border border-transparent'
             }`}
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>Upload Raw CSV / Ledger</span>
+            <span>Upload Statement</span>
           </button>
         </div>
       </div>
 
       {mode === 'archetype' ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {Object.entries(PRELOADED_PROFILES).map(([key, profile]) => {
-            const isSelected = selectedProfileKey === key;
-            return (
-              <button
-                key={key}
-                id={`profile-card-${profile.csv_key}`}
-                type="button"
-                onClick={() => onProfileSelect(key)}
-                className={`text-left p-4 rounded-xl border transition-all relative ${
-                  isSelected
-                    ? 'border-blue-600 bg-blue-50/40 shadow-xs ring-1 ring-blue-500'
-                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 bg-white'
-                }`}
-              >
-                {isSelected && (
-                  <CheckCircle2 className="w-4 h-4 text-blue-600 absolute top-3.5 right-3.5" />
-                )}
-                <div className="font-semibold text-sm text-slate-900 pr-6">{key}</div>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{profile.driver}</p>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            {Object.entries(PRELOADED_PROFILES).map(([key, p]) => {
+              const isSelected = selectedProfileKey === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => onProfileSelect(key)}
+                  disabled={isLoading}
+                  className={`p-4 rounded-lg text-left transition-all border flex flex-col justify-between ${
+                    isSelected
+                      ? 'bg-slate-900 border-blue-500/60 text-slate-100 shadow-xs ring-1 ring-blue-500/40'
+                      : 'bg-slate-950/70 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-900/60'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold text-slate-100 font-sans">{p.name}</span>
+                      {isSelected ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      ) : (
+                        <div className="w-3 h-3 rounded-full border border-slate-700" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-sans line-clamp-2 leading-relaxed">
+                      {p.driver}
+                    </p>
+                  </div>
+                  <div className="mt-3.5 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-300">
+                    <span className="text-slate-200 font-medium">Inflow: ₦{(p.monthly_inflow / 1000).toFixed(0)}k/mo</span>
+                    <span className="text-slate-400">Vol: {p.volatility}%</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Inflow:</span>
-                  <span className="font-medium text-slate-800">
-                    ₦{(profile.monthly_inflow / 1000).toFixed(0)}k/mo
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-1">
-                  <span className="text-slate-500">Volatility:</span>
-                  <span className="font-medium text-slate-800">{profile.volatility}%</span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-1">
-                  <span className="text-slate-500">Velocity:</span>
-                  <span className="font-medium text-slate-800">{profile.daily_tx} tx/day</span>
-                </div>
-              </button>
-            );
-          })}
+          {/* Requested Facility Slider & Input */}
+          <div className="p-4 rounded-lg bg-slate-950/80 border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <label className="text-xs font-medium uppercase tracking-wider text-slate-300 font-mono">
+                Requested Facility Limit (₦)
+              </label>
+              <p className="text-xs text-slate-400 font-sans">
+                Adjust target credit facility to simulate underwriting stress testing
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={200000}
+                max={5000000}
+                step={50000}
+                value={loanRequested}
+                onChange={(e) => onLoanRequestedChange(Number(e.target.value))}
+                className="w-36 sm:w-48 accent-blue-500 cursor-pointer"
+              />
+              <div className="px-3 py-1.5 rounded bg-slate-900 border border-slate-700 text-xs font-mono font-bold text-slate-50 tabular-nums">
+                ₦{loanRequested.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
+        /* Ingestion Dropzone per Directive #3.C */
         <div
-          id="dropzone-area"
           onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-6 text-center cursor-pointer bg-slate-50/60 hover:bg-blue-50/20 transition-all"
+          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
+            isDragging
+              ? 'border-blue-500 bg-blue-950/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]'
+              : 'border-slate-700/80 bg-slate-900/40 hover:border-blue-500/60 hover:bg-slate-900/80'
+          }`}
         >
           <input
             ref={fileInputRef}
             type="file"
-            accept=".csv,.txt"
+            accept=".csv,.txt,.pdf"
             onChange={handleFileInputChange}
             className="hidden"
-            id="file-upload-input"
           />
-          <div className="w-12 h-12 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
-            <FileSpreadsheet className="w-6 h-6" />
+
+          {/* Soft blue circular badge wrapping the upload icon */}
+          <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mx-auto mb-3 text-blue-400 shadow-sm">
+            <Upload className="w-5 h-5" />
           </div>
-          <h3 className="text-sm font-semibold text-slate-900">Upload Bank or POS Transaction Ledger</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-            Drop your CSV file here or click to browse (Max 5MB per CWE-400 policy). Columns will be deep-scrubbed for
-            PII minimization per NDPA Section 24.
+
+          <h3 className="text-xs font-semibold text-slate-100 font-mono mb-1">
+            Drop raw CSV, TXT, or PDF bank statement here
+          </h3>
+          <p className="text-xs text-slate-400 max-w-md mx-auto font-sans leading-relaxed">
+            5MB maximum file size. Deterministic PII sanitization (BVN, phone numbers, customer accounts) executes automatically before feature extraction.
           </p>
-          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-slate-200 text-xs text-slate-600 font-medium">
-            <span>Supported: OPay, Moniepoint, PalmPay, GTB, Access CSVs</span>
+
+          <div className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-slate-800/90 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-200 transition-colors shadow-xs">
+            <FileSpreadsheet className="w-3.5 h-3.5 text-blue-400" />
+            <span>Browse Statement File</span>
           </div>
         </div>
       )}
-
-      {/* Loan Request input adjustment */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-slate-600">
-          <span>Target Loan Facility Request:</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">₦</span>
-            <input
-              id="loan-amount-input"
-              type="number"
-              min={50000}
-              max={50000000}
-              step={50000}
-              value={loanRequested}
-              onChange={(e) => onLoanRequestedChange(Number(e.target.value) || 0)}
-              className="pl-7 pr-3 py-1.5 w-44 rounded-lg border border-slate-300 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          {isLoading && (
-            <div className="flex items-center gap-1.5 text-xs text-blue-600 font-medium">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Analyzing...</span>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

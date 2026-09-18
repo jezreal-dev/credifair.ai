@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, KeyRound, CheckCircle, Copy, Check, Lock } from 'lucide-react';
+import { ShieldCheck, Copy, Check, Lock, CheckCircle2 } from 'lucide-react';
 import { AuditManifest, ConformalRisk, MerchantVitals } from '../types';
 
 interface ComplianceSignOffProps {
@@ -31,6 +31,15 @@ export const ComplianceSignOff: React.FC<ComplianceSignOffProps> = ({ vitals, ri
       const data = await res.json();
       if (data.sealed_manifest) {
         setManifest(data.sealed_manifest);
+
+        try {
+          const stored = localStorage.getItem('credifair_sealed_vault');
+          const list: AuditManifest[] = stored ? JSON.parse(stored) : [];
+          list.unshift(data.sealed_manifest);
+          localStorage.setItem('credifair_sealed_vault', JSON.stringify(list.slice(0, 50)));
+        } catch (e) {
+          console.warn('Vault storage notice:', e);
+        }
       }
     } catch (err) {
       console.error('Sign off failed:', err);
@@ -47,115 +56,105 @@ export const ComplianceSignOff: React.FC<ComplianceSignOffProps> = ({ vitals, ri
   };
 
   return (
-    <div id="compliance-signoff-panel" className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-      <div className="flex items-start justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
+    <div
+      id="compliance-signoff-panel"
+      className="bg-[#121824] rounded-xl border border-slate-800/80 p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:bg-slate-900 shadow-xs"
+    >
+      <div className="flex items-start justify-between gap-4 mb-4 pb-3 border-b border-slate-800/80">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-slate-900">
-              5. Regulatory Compliance &amp; Human Underwriting Sign-Off
+            <h2 className="text-sm font-semibold text-slate-100 tracking-tight">
+              Section 37 Statutory Underwriting Sign-Off
             </h2>
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
               Statutory Gate
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Per NDPA 2023 Section 37, credit decisions cannot be executed via solely automated processing without
-            auditable human sign-off.
+          <p className="text-xs text-slate-400 mt-0.5 font-medium">
+            Nigeria Data Protection Act (NDPA) 2023 §37 mandate: automated credit profiling cannot solely determine credit facilities without verifiable human intervention.
           </p>
         </div>
-        <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
-          <ShieldCheck className="w-5 h-5" />
-        </div>
       </div>
 
-      {/* Officer Input & Action Row */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5">
-        <div className="flex-1">
-          <label htmlFor="officer-id-input" className="block text-xs font-medium text-slate-700 mb-1">
-            Loan Officer Full Name / Staff Accreditation ID:
-          </label>
-          <div className="relative">
-            <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              id="officer-id-input"
-              type="text"
-              value={officerId}
-              onChange={(e) => setOfficerId(e.target.value)}
-              placeholder="e.g. LO-ABUJA-741 or Grace Okon"
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-900"
-            />
+      {!manifest ? (
+        <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-4">
+          <div className="text-xs text-slate-300 font-mono space-y-1.5">
+            <div className="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">
+              Statutory Notice &amp; Attestation:
+            </div>
+            <p className="text-slate-400 leading-relaxed font-sans text-xs">
+              By executing this cryptographic signature, the designated human credit risk officer confirms direct oversight, verifies the conformal risk interval, and certifies the evaluation as legally binding under Nigerian financial law.
+            </p>
           </div>
-        </div>
 
-        <button
-          id="btn-generate-manifest"
-          type="button"
-          onClick={handleSignOff}
-          disabled={isSealing || !officerId.trim()}
-          className="sm:self-end py-2.5 px-5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
-        >
-          <Lock className="w-3.5 h-3.5 text-emerald-400" />
-          <span>{isSealing ? 'Sealing Cryptographic Manifest...' : 'Seal Statutory Audit Manifest'}</span>
-        </button>
-      </div>
-
-      {/* Manifest Display */}
-      {manifest && (
-        <div id="sealed-manifest-result" className="rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 animate-in fade-in duration-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-emerald-200/60">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
-              <div>
-                <div className="text-xs font-bold text-emerald-950">
-                  Statutory Audit Manifest Sealed Under SHA-256
-                </div>
-                <div className="text-[11px] text-emerald-800 font-mono break-all">
-                  Hash: {manifest.audit_hash_sha256}
-                </div>
-              </div>
+              <label className="text-xs font-mono text-slate-400">Loan Officer ID:</label>
+              <input
+                type="text"
+                value={officerId}
+                onChange={(e) => setOfficerId(e.target.value)}
+                placeholder="e.g. LO-LAGOS-012"
+                className="px-3 py-1.5 rounded-md bg-slate-900 border border-slate-700 text-xs font-mono text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
             </div>
 
             <button
               type="button"
-              onClick={handleCopyManifest}
-              className="self-start sm:self-auto inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white border border-emerald-300 text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition-colors"
+              onClick={handleSignOff}
+              disabled={isSealing || !officerId.trim()}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-semibold transition-all shadow-xs disabled:opacity-50 hover:shadow-blue-500/25"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied JSON' : 'Copy Manifest'}</span>
+              <Lock className="w-3.5 h-3.5" />
+              <span>{isSealing ? 'Sealing Cryptographic Manifest...' : 'Execute Human Sign-Off'}</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4 font-mono">
+          <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span className="font-semibold">
+                Legally Binding Audit Manifest Sealed (NDPA 2023 §37 Verified)
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyManifest}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-emerald-500/40 text-xs text-emerald-300 hover:bg-slate-800 transition-colors shadow-xs"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Copied' : 'Copy JSON'}</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3 text-xs">
-            <div className="p-2 bg-white rounded-lg border border-emerald-100">
-              <span className="text-[11px] text-slate-400 block">NDPA Compliance</span>
-              <span className="font-semibold text-emerald-700">{manifest.ndpa_compliance}</span>
-            </div>
-            <div className="p-2 bg-white rounded-lg border border-emerald-100">
-              <span className="text-[11px] text-slate-400 block">Assigned Officer</span>
-              <span className="font-semibold text-slate-800">{manifest.governance_status.assigned_officer}</span>
-            </div>
-            <div className="p-2 bg-white rounded-lg border border-emerald-100">
-              <span className="text-[11px] text-slate-400 block">Automated Solely</span>
-              <span className="font-semibold text-slate-800">
-                {manifest.governance_status.solely_automated_execution ? 'Yes' : 'No (Human Verified)'}
+          <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2.5 text-xs">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+              <span className="text-slate-400">Canonical SHA-256 Audit Seal:</span>
+              <span className="font-bold text-slate-100 font-mono text-xs break-all">
+                {manifest.audit_hash_sha256}
               </span>
             </div>
-            <div className="p-2 bg-white rounded-lg border border-emerald-100">
-              <span className="text-[11px] text-slate-400 block">Sealed Timestamp</span>
-              <span className="font-semibold text-slate-800 truncate block">
-                {new Date(manifest.timestamp_utc).toLocaleTimeString()} UTC
-              </span>
+            <div className="grid grid-cols-2 gap-2.5 text-xs pt-1">
+              <div>
+                <span className="text-slate-400">Merchant Pseudonym:</span>{' '}
+                <span className="text-slate-200">{manifest.pseudonymized_id}</span>
+              </div>
+              <div>
+                <span className="text-slate-400">Assigned Officer:</span>{' '}
+                <span className="text-slate-200">{manifest.governance_status.assigned_officer}</span>
+              </div>
+              <div>
+                <span className="text-slate-400">Timestamp UTC:</span>{' '}
+                <span className="text-slate-200">{manifest.timestamp_utc}</span>
+              </div>
+              <div>
+                <span className="text-slate-400">Signature Status:</span>{' '}
+                <span className="text-emerald-400 font-semibold">{manifest.governance_status.signature_status}</span>
+              </div>
             </div>
           </div>
-
-          <details className="text-xs">
-            <summary className="font-mono text-slate-600 cursor-pointer hover:text-slate-900 select-none">
-              Inspect Canonical RFC 8785 Manifest JSON
-            </summary>
-            <pre className="mt-2 p-3 rounded-lg bg-slate-900 text-slate-100 font-mono text-[11px] overflow-x-auto">
-              {JSON.stringify(manifest, null, 2)}
-            </pre>
-          </details>
         </div>
       )}
     </div>

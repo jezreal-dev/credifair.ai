@@ -6,6 +6,15 @@ export interface TransactionRecord {
   balance?: number;
 }
 
+export interface ForensicAudit {
+  is_flagged: boolean;
+  fraud_risk_level: 'CLEAN' | 'ELEVATED' | 'HIGH';
+  risk_penalty_points: number;
+  forensic_flags: string[];
+  round_trip_ratio_pct: number;
+  volume_concentration_pct: number;
+}
+
 export interface MerchantVitals {
   merchant_id: string;
   merchant_name?: string;
@@ -17,6 +26,7 @@ export interface MerchantVitals {
   total_records: number;
   active_days: number;
   driver: string;
+  forensic_audit?: ForensicAudit;
 }
 
 export interface ConformalRisk {
@@ -63,6 +73,7 @@ export interface AnalysisResponse {
   conformal_risk: ConformalRisk;
   llm_explanation: DualLanguageExplanation;
   sample_records: TransactionRecord[];
+  forensic_audit?: ForensicAudit;
 }
 
 export interface PreloadedProfile {

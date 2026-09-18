@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { MerchantVitals, TransactionRecord } from '../src/types';
 import { CrediFairComplianceGuard } from './compliance';
+import { ForensicRiskGuard } from './forensics';
 
 export class RealDocumentParser {
   static cleanCurrency(val: any): number {
@@ -89,7 +90,10 @@ export class RealDocumentParser {
     const stdAmt = amounts.length > 1 ? Math.sqrt(variance / (amounts.length - 1)) : 0;
 
     let volatility = meanAmt > 0 ? (stdAmt / meanAmt) * 100.0 : 50.0;
-    volatility = Math.max(5.0, Math.min(95.0, volatility));
+
+    // Forensic Transaction Analysis & Volatility Penalty Adjustment
+    const forensics = ForensicRiskGuard.analyzeLedgerForensics(records);
+    const adjustedVolatility = Math.max(5.0, Math.min(95.0, volatility + forensics.risk_penalty_points));
 
     const activeDays = Math.max(1, uniqueDates.size);
     const dailyTx = Math.max(1, Math.round(records.length / activeDays));
@@ -108,12 +112,13 @@ export class RealDocumentParser {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      volatility: Math.round(volatility * 10) / 10,
+      volatility: Math.round(adjustedVolatility * 10) / 10,
       daily_tx: dailyTx,
       loan_requested: loanRequested,
       total_records: records.length,
       active_days: activeDays,
       driver: `Extracted from ${records.length} authentic records across ${activeDays} business days.`,
+      forensic_audit: forensics,
     };
   }
 }
