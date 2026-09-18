@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Target, AlertTriangle, CheckCircle2, XCircle, ShieldAlert } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { ConformalRisk, ForensicAudit } from '../types';
+import { ShieldCheck, AlertTriangle, XCircle, Info, CheckCircle2 } from 'lucide-react';
 
 interface ConformalRiskBarProps {
   risk: ConformalRisk;
@@ -8,206 +8,189 @@ interface ConformalRiskBarProps {
 }
 
 export const ConformalRiskBar: React.FC<ConformalRiskBarProps> = ({ risk, forensicAudit }) => {
-  const [animated, setAnimated] = useState(false);
+  const [lower, setLower] = useState(0);
+  const [point, setPoint] = useState(0);
+  const [upper, setUpper] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setAnimated(true), 40);
+    const targetLower = risk.lower_bound_pct;
+    const targetPoint = risk.point_risk_pct;
+    const targetUpper = risk.upper_bound_pct;
+
+    const timer = setTimeout(() => {
+      setLower(targetLower);
+      setPoint(targetPoint);
+      setUpper(targetUpper);
+    }, 50);
+
     return () => clearTimeout(timer);
-  }, [risk]);
+  }, [risk.lower_bound_pct, risk.point_risk_pct, risk.upper_bound_pct]);
 
-  const isApproval = risk.upper_bound_pct <= 20.0;
-  const isManual = risk.upper_bound_pct > 20.0 && risk.upper_bound_pct <= 45.0;
+  const leftPercent = Math.max(0, Math.min(100, lower));
+  const widthPercent = Math.max(0.5, Math.min(100 - leftPercent, upper - lower));
+  const pointPercent = Math.max(0, Math.min(100, point));
 
-  // Semantic decision labels & styles per Directive #2
-  const verdict = isApproval
-    ? 'RECOMMENDED FOR APPROVAL'
-    : isManual
-      ? 'MANUAL UNDERWRITING REVIEW REQUIRED'
-      : 'RECOMMENDED FOR DECLINE';
+  const getDecisionBadge = (recommendation: string) => {
+    if (recommendation.includes('APPROVAL')) {
+      return {
+        label: 'APPROVE',
+        bg: 'bg-[#E4FFF8]',
+        text: 'text-[#006C51]',
+        border: 'border-[#1DCF9F]/40',
+        icon: CheckCircle2,
+        desc: 'Upper 95% bound strictly under 20% limit. Safe for automated working capital extension.',
+      };
+    }
+    if (recommendation.includes('REVIEW') || recommendation.includes('MANUAL')) {
+      return {
+        label: 'CONDITIONAL REVIEW',
+        bg: 'bg-amber-50',
+        text: 'text-amber-800',
+        border: 'border-amber-300',
+        icon: AlertTriangle,
+        desc: 'Confidence band traverses the 20% approval boundary. Requires supervisory review.',
+      };
+    }
+    return {
+      label: 'DECLINE',
+      bg: 'bg-rose-50',
+      text: 'text-rose-800',
+      border: 'border-rose-300',
+      icon: XCircle,
+      desc: 'Lower bound exceeds 45% default floor. Credit risk too high for uncollateralized line.',
+    };
+  };
 
-  const badgeStyle = isApproval
-    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-    : isManual
-      ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-      : 'bg-rose-500/10 text-rose-400 border-rose-500/30';
-
-  const Icon = isApproval ? CheckCircle2 : isManual ? AlertTriangle : XCircle;
-
-  const leftPct = Math.max(0, Math.min(100, risk.lower_bound_pct));
-  const rightPct = Math.max(0, Math.min(100, risk.upper_bound_pct));
-  const pointPct = Math.max(0, Math.min(100, risk.point_risk_pct));
-  const bandWidth = Math.max(1.5, rightPct - leftPct);
+  const badge = getDecisionBadge(risk.recommendation);
+  const IconComp = badge.icon;
 
   return (
     <div
-      id="conformal-risk-panel"
-      className="bg-[#121824] rounded-xl border border-slate-800/80 p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:bg-slate-900 shadow-xs"
+      id="conformal-risk-gauge-panel"
+      className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-[0_4px_24px_rgba(33,15,96,0.05)] space-y-6"
     >
-      {/* Header with Title and Deterministic Semantic Decision Badge */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-slate-100 tracking-tight">
-              Conformal Prediction Range Gauge
-            </h2>
-            <span className="text-[11px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-              α = 0.05
+            <span className="w-6 h-6 rounded-full bg-[#E4FFF8] text-[#006C51] flex items-center justify-center text-xs font-bold">
+              3
             </span>
+            <h2 className="text-lg font-bold text-[#210F60] tracking-tight">
+              Inductive Conformal Risk Calibration (95% Coverage)
+            </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5 font-medium">
-            Distribution-free finite-sample coverage calibrated over empirical Nigerian MSME trade cycles
+          <p className="text-xs text-slate-500 font-medium mt-1 pl-8">
+            Distribution-free split conformal inference. The merchant’s true default probability is mathematically proven to fall within this interval.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          {forensicAudit && (
-            <div
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-medium border ${
-                forensicAudit.fraud_risk_level === 'CLEAN'
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                  : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-              }`}
-            >
-              <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-              <span>FORENSIC: {forensicAudit.fraud_risk_level}</span>
-            </div>
-          )}
-
-          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono font-semibold border ${badgeStyle}`}>
-            <Icon className="w-3.5 h-3.5 shrink-0" />
-            <span>{verdict}</span>
-          </div>
+        {/* OPay Decision Badge */}
+        <div
+          className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold font-mono ${badge.bg} ${badge.text} ${badge.border}`}
+        >
+          <IconComp className="w-4 h-4 shrink-0" />
+          <span>STATUS: {badge.label}</span>
         </div>
       </div>
 
-      {/* 3-Column Monospace Vitals for Intervals */}
-      <div className="grid grid-cols-3 gap-3 mb-6 font-mono">
-        <div className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-800/80 hover:border-slate-700 transition-colors">
-          <div className="text-xs font-medium uppercase tracking-wider text-slate-400">95% Lower Bound</div>
-          <div className="text-xl font-bold text-slate-50 mt-1 tabular-nums">
-            {risk.lower_bound_pct.toFixed(2)}%
-          </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">Optimistic floor</div>
-        </div>
-
-        <div className="p-3.5 rounded-lg bg-slate-950/80 border border-blue-500/40 hover:border-blue-500/70 transition-colors">
-          <div className="text-xs font-medium uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Target className="w-3.5 h-3.5 text-rose-500" />
-            <span>Point Estimate</span>
-          </div>
-          <div className="text-xl font-bold text-rose-400 mt-1 tabular-nums">
-            {risk.point_risk_pct.toFixed(2)}%
-          </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">Expected default risk</div>
-        </div>
-
-        <div className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-800/80 hover:border-slate-700 transition-colors">
-          <div className="text-xs font-medium uppercase tracking-wider text-slate-400">95% Upper Bound</div>
-          <div className="text-xl font-bold text-slate-50 mt-1 tabular-nums">
-            {risk.upper_bound_pct.toFixed(2)}%
-          </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">Statutory cutoff gate</div>
+      {/* Decision Summary Card */}
+      <div className={`p-4 rounded-2xl border text-xs leading-relaxed flex items-start gap-3 ${badge.bg} ${badge.text} ${badge.border}`}>
+        <IconComp className="w-5 h-5 shrink-0 mt-0.5" />
+        <div>
+          <strong className="font-bold">Underwriting Disposition: </strong>
+          <span>{badge.desc}</span>
         </div>
       </div>
 
-      {/* Multi-Layer Conformal Gauge per Directive #3.A */}
-      <div className="space-y-3 pt-1">
-        <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+      {/* 3 Metric Summary Boxes */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-center">
+        <div className="p-4 rounded-2xl bg-[#F8FBFF] border border-slate-100">
+          <div className="text-[11px] font-sans font-extrabold uppercase text-slate-500">
+            Lower 95% Bound
+          </div>
+          <div className="text-2xl font-black text-[#210F60] mt-1 tabular-nums">
+            {lower.toFixed(1)}%
+          </div>
+          <div className="text-[10px] text-slate-400 font-sans mt-0.5">Optimistic default floor</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#E4FFF8] border border-[#1DCF9F]/40">
+          <div className="text-[11px] font-sans font-extrabold uppercase text-[#006C51]">
+            Calibrated Point Risk
+          </div>
+          <div className="text-2xl font-black text-[#006C51] mt-1 tabular-nums">
+            {point.toFixed(1)}%
+          </div>
+          <div className="text-[10px] text-[#006C51] font-sans mt-0.5">Central estimate</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#F8FBFF] border border-slate-100">
+          <div className="text-[11px] font-sans font-extrabold uppercase text-slate-500">
+            Upper 95% Bound
+          </div>
+          <div className="text-2xl font-black text-[#210F60] mt-1 tabular-nums">
+            {upper.toFixed(1)}%
+          </div>
+          <div className="text-[10px] text-slate-400 font-sans mt-0.5">Pessimistic stress ceiling</div>
+        </div>
+      </div>
+
+      {/* Interactive Visual Gauge */}
+      <div className="space-y-2 pt-2">
+        <div className="flex items-center justify-between text-xs font-mono text-slate-500">
           <span>0.0% (Zero Risk)</span>
-          <span className="text-slate-300 font-medium">Underwriting Cutoffs: τ = 20% (Approval) / τ = 45% (Review)</span>
-          <span>100.0% (Maximum Risk)</span>
+          <span className="font-bold text-[#006C51]">Approval Limit: 20%</span>
+          <span className="font-bold text-rose-600">Decline Limit: 45%</span>
+          <span>100.0% (Total Default)</span>
         </div>
 
-        {/* Gauge Track Area */}
-        <div className="relative pt-3 pb-8 px-1">
-          {/* Subtle Inset Rail Track (h-3 rounded-full bg-slate-800/60) */}
-          <div className="relative h-3 w-full bg-slate-800/60 rounded-full border border-slate-700/50 overflow-visible flex items-center">
-            {/* 95% Confidence Interval Band: Colored gradient pill with soft ambient glow */}
-            <div
-              className="absolute top-0 bottom-0 rounded-full bg-gradient-to-r from-blue-600/30 via-indigo-500/40 to-blue-600/30 border border-blue-400/50 shadow-[0_0_12px_rgba(59,130,246,0.2)] transition-all ease-out"
-              style={{
-                transitionDuration: '300ms',
-                left: animated ? `${leftPct}%` : `${pointPct}%`,
-                width: animated ? `${bandWidth}%` : '0%',
-              }}
-              title={`95% Conformal Confidence Band: [${risk.lower_bound_pct}% — ${risk.upper_bound_pct}%]`}
-            />
+        <div className="relative h-10 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200">
+          {/* Green approval zone */}
+          <div
+            className="absolute top-0 bottom-0 left-0 bg-[#E4FFF8] border-r border-[#1DCF9F]/50"
+            style={{ width: '20%' }}
+          />
+          {/* Amber conditional zone */}
+          <div
+            className="absolute top-0 bottom-0 bg-amber-50 border-r border-amber-200"
+            style={{ left: '20%', width: '25%' }}
+          />
+          {/* Rose decline zone */}
+          <div
+            className="absolute top-0 bottom-0 right-0 bg-rose-50"
+            style={{ left: '45%' }}
+          />
 
-            {/* Precision Diamond Marker for Point Estimate (rotate-45 bg-rose-500 border-2 border-white shadow-md) */}
-            <div
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-30 transition-all ease-out cursor-pointer"
-              style={{
-                transitionDuration: '300ms',
-                left: `${pointPct}%`,
-              }}
-              title={`Point Estimate: ${risk.point_risk_pct.toFixed(2)}%`}
-            >
-              <div className="w-3.5 h-3.5 rotate-45 bg-rose-500 border-2 border-white shadow-md hover:scale-125 transition-transform" />
-            </div>
-
-            {/* Critical Threshold Marker lines at tau = 20% and tau = 45% */}
-            <div
-              className="absolute -top-3 -bottom-3 border-r border-dashed border-emerald-500/60 z-10 pointer-events-none"
-              style={{ left: '20%' }}
-            />
-            <div
-              className="absolute -top-3 -bottom-3 border-r border-dashed border-amber-500/60 z-10 pointer-events-none"
-              style={{ left: '45%' }}
-            />
+          {/* Conformal Prediction Interval Ribbon */}
+          <div
+            className="absolute top-1 bottom-1 rounded-xl bg-[#1DCF9F] shadow-sm transition-all duration-500 ease-out flex items-center justify-center opacity-90"
+            style={{
+              left: `${leftPercent}%`,
+              width: `${widthPercent}%`,
+            }}
+          >
+            <span className="text-[10px] font-mono font-bold text-[#210F60] px-1 truncate">
+              [{lower.toFixed(1)}% — {upper.toFixed(1)}%]
+            </span>
           </div>
 
-          {/* Under-Gauge Tick Labels & Threshold Markers */}
-          <div className="relative h-5 mt-2 font-mono text-[10px]">
-            {/* 20% Tick Indicator */}
-            <div
-              className="absolute top-0 -translate-x-1/2 flex flex-col items-center pointer-events-none"
-              style={{ left: '20%' }}
-            >
-              <div className="w-px h-1.5 bg-emerald-500/60 mb-0.5" />
-              <span className="text-emerald-400 bg-slate-950/90 px-1 py-0.5 rounded border border-emerald-500/30 whitespace-nowrap">
-                τ = 20%
-              </span>
-            </div>
-
-            {/* 45% Tick Indicator */}
-            <div
-              className="absolute top-0 -translate-x-1/2 flex flex-col items-center pointer-events-none"
-              style={{ left: '45%' }}
-            >
-              <div className="w-px h-1.5 bg-amber-500/60 mb-0.5" />
-              <span className="text-amber-400 bg-slate-950/90 px-1 py-0.5 rounded border border-amber-500/30 whitespace-nowrap">
-                τ = 45%
-              </span>
-            </div>
-
-            {/* Point Estimate Tooltip Value Pill */}
-            <div
-              className="absolute top-0 -translate-x-1/2 flex flex-col items-center pointer-events-none z-20"
-              style={{ left: `${pointPct}%` }}
-            >
-              <div className="w-px h-1.5 bg-rose-500 mb-0.5" />
-              <span className="text-rose-300 font-bold bg-slate-950 px-1.5 py-0.5 rounded border border-rose-500/40 shadow-xs whitespace-nowrap">
-                {risk.point_risk_pct.toFixed(1)}%
-              </span>
-            </div>
-          </div>
+          {/* Central Point Risk Marker */}
+          <div
+            className="absolute top-0 bottom-0 w-1 bg-[#210F60] shadow-md z-10 transition-all duration-500 ease-out"
+            style={{ left: `${pointPercent}%` }}
+          />
         </div>
 
-        {/* Legend / Diagnostics */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-mono text-slate-400 pt-1 border-t border-slate-800/80">
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-2 rounded-full bg-gradient-to-r from-blue-600/50 to-indigo-500/50 border border-blue-400/60 inline-block shadow-xs" />
-              <span>95% Conformal Confidence Band (Spread: {(risk.upper_bound_pct - risk.lower_bound_pct).toFixed(2)}%)</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rotate-45 bg-rose-500 border border-white inline-block" />
-              <span>Point Estimate Marker</span>
-            </span>
-          </div>
-          <div className="text-slate-400">
-            Holdout Coverage: {(risk.empirical_calibration_coverage * 100).toFixed(1)}%
-          </div>
+        <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium pt-1">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#1DCF9F] inline-block" />
+            <span>95% Conformal Confidence Range</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-[#210F60] inline-block" />
+            <span>Point Risk Estimate: {point.toFixed(1)}%</span>
+          </span>
+          <span>Finite-sample empirical coverage guarantee</span>
         </div>
       </div>
     </div>

@@ -19,7 +19,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#0B0E14] text-slate-100 flex flex-col font-sans selection:bg-blue-500/20 selection:text-blue-200">
+      <div className="min-h-screen bg-[#F8FBFF] text-[#210F60] flex flex-col font-sans selection:bg-[#1DCF9F]/30 selection:text-[#210F60]">
         <Navbar health={health} />
         <div className="flex-1">
           <Routes>

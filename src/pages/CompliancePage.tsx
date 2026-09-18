@@ -6,6 +6,9 @@ import {
   Check,
   Download,
   ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  FileCheck2,
 } from 'lucide-react';
 import { AuditManifest } from '../types';
 
@@ -58,13 +61,11 @@ export const CompliancePage: React.FC = () => {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const combined = [...parsed, ...SEED_MANIFESTS];
-          const unique = Array.from(new Map(combined.map((m) => [m.audit_hash_sha256, m])).values());
-          setManifests(unique);
+          setManifests((prev) => [...parsed, ...prev]);
         }
       }
-    } catch (e) {
-      console.warn('Could not read sealed vault:', e);
+    } catch {
+      // fallback to seed
     }
   }, []);
 
@@ -74,82 +75,90 @@ export const CompliancePage: React.FC = () => {
     setTimeout(() => setCopiedHash(null), 2000);
   };
 
-  const handleDownloadBundle = () => {
+  const handleDownloadAll = () => {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifests, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `credifair_audit_manifests_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute('download', `credifair_ndpa_audit_vault_${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
   return (
-    <div id="compliance-page-root" className="min-h-screen bg-[#0B0E14] text-slate-100 font-sans pb-20">
-      {/* Top bar */}
-      <div className="bg-[#121824] border-b border-slate-800/80 py-3 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
+    <div id="compliance-page-root" className="min-h-screen bg-[#F8FBFF] text-[#210F60] font-sans pb-24">
+      {/* Header bar */}
+      <div className="bg-white border-b border-slate-200/80 py-4 px-4 sm:px-6 lg:px-8 sticky top-20 z-40 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-100 uppercase tracking-wide">
-                Compliance Manifest Vault
+              <span className="text-base font-extrabold text-[#210F60] tracking-tight">
+                NDPA 2023 Section 37 Statutory Audit Vault
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                NDPA 2023 §37 Tamper-Proof
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#E4FFF8] text-[#006C51] border border-[#1DCF9F]/30">
+                Tamper-Evident Ledger
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5 font-sans font-medium">
-              Cryptographically sealed audit records for regulatory inspection and human underwriting sign-offs.
+            <p className="text-xs text-slate-500 mt-1 font-medium">
+              Verifiable SHA-256 cryptographic manifests certifying human supervisory sign-off on credit determinations.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={handleDownloadBundle}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 transition-colors shadow-xs"
+              onClick={handleDownloadAll}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-[#210F60] transition-colors shadow-xs"
             >
-              <Download className="w-3.5 h-3.5 text-blue-400" />
-              <span>Download JSON Audit Bundle</span>
+              <Download className="w-3.5 h-3.5 text-[#1DCF9F]" />
+              <span>Export Audit Bundle (.json)</span>
             </button>
             <Link
               to="/app"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-xs"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#1DCF9F] hover:bg-[#1ac395] text-[#210F60] text-xs font-bold transition-all shadow-md"
             >
-              <span>Back to Studio</span>
-              <ArrowRight className="w-3 h-3" />
+              <span>Launch Studio</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-4 font-mono">
-        <div className="flex items-center justify-between text-xs text-slate-400 pb-1">
-          <span>Sealed Assessments ({manifests.length} total)</span>
-          <span>SHA-256 Canonical JSON Serialization</span>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
+        {/* Compliance Statute Banner */}
+        <div className="p-6 rounded-3xl bg-[#210F60] text-white space-y-2 shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-10 -mt-10 w-60 h-60 rounded-full bg-[#1DCF9F]/15 blur-xl pointer-events-none" />
+          <div className="flex items-center gap-2 font-bold text-sm text-[#1DCF9F]">
+            <ShieldCheck className="w-5 h-5" />
+            <span>Nigeria Data Protection Act (NDPA) 2023 Section 37 Mandate</span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-200 max-w-3xl leading-relaxed">
+            A data subject has the right not to be subjected to a decision based solely on automated processing, including profiling, which produces legal or similarly significant effects. CrediFair AI strictly enforces supervisory human credit analyst sign-off before any credit limit or loan decision takes legal effect.
+          </p>
         </div>
 
-        {manifests.map((m) => {
-          const isApproval = m.governance_status.recommendation === 'RECOMMENDED FOR APPROVAL';
+        {/* Manifest Entries */}
+        {manifests.map((m, idx) => {
+          const isApproval = m.governance_status.recommendation.includes('APPROVAL');
           return (
             <div
-              key={m.audit_hash_sha256}
-              className="p-5 sm:p-6 rounded-xl bg-[#121824] border border-slate-800/80 space-y-3.5 transition-all duration-200 hover:border-blue-500/40 hover:bg-slate-900 shadow-xs"
+              key={idx}
+              className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-100 shadow-[0_4px_24px_rgba(33,15,96,0.05)] space-y-4"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div className="flex items-center gap-2">
-                  <Lock className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="font-bold text-slate-100">{m.pseudonymized_id}</span>
-                  <span className="text-slate-600">|</span>
-                  <span className="text-slate-400">{m.timestamp_utc}</span>
+                  <Lock className="w-4 h-4 text-[#1DCF9F]" />
+                  <span className="font-extrabold text-[#210F60]">{m.pseudonymized_id}</span>
+                  <span className="text-slate-300">|</span>
+                  <span className="text-xs text-slate-500 font-mono">{m.timestamp_utc}</span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <span
-                    className={`px-2.5 py-0.5 rounded text-xs font-mono font-semibold border ${
+                    className={`px-3 py-1 rounded-full text-xs font-bold font-mono border ${
                       isApproval
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                        : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                        ? 'bg-[#E4FFF8] text-[#006C51] border-[#1DCF9F]/40'
+                        : 'bg-amber-50 text-amber-800 border-amber-300'
                     }`}
                   >
                     {m.governance_status.recommendation}
@@ -157,44 +166,48 @@ export const CompliancePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleCopy(JSON.stringify(m, null, 2), m.audit_hash_sha256)}
-                    className="p-1 rounded-md bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-100 transition-colors"
+                    className="p-2 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-500 transition-colors"
                     title="Copy full JSON manifest"
                   >
                     {copiedHash === m.audit_hash_sha256 ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <Check className="w-4 h-4 text-[#1DCF9F]" />
                     ) : (
-                      <Copy className="w-3.5 h-3.5" />
+                      <Copy className="w-4 h-4" />
                     )}
                   </button>
                 </div>
               </div>
 
               {/* Hash and Supervisory Officer Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
-                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">SHA-256 Audit Seal</div>
-                  <div className="font-bold text-slate-200 text-[11px] break-all">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                <div className="p-4 rounded-2xl bg-[#F8FBFF] border border-slate-100 space-y-1">
+                  <div className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider font-sans">
+                    SHA-256 Cryptographic Seal
+                  </div>
+                  <div className="font-bold text-[#210F60] text-[11px] break-all">
                     {m.audit_hash_sha256}
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
-                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Supervisory Officer</div>
-                  <div className="text-slate-200 text-xs">
+                <div className="p-4 rounded-2xl bg-[#F8FBFF] border border-slate-100 space-y-1">
+                  <div className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider font-sans">
+                    Supervisory Officer
+                  </div>
+                  <div className="text-[#210F60] font-bold text-xs font-sans">
                     {m.governance_status.assigned_officer}
                   </div>
-                  <div className="text-[11px] text-emerald-400 font-semibold">
+                  <div className="text-[11px] text-[#006C51] font-extrabold">
                     STATUS: {m.governance_status.signature_status}
                   </div>
                 </div>
               </div>
 
-              <div className="text-xs text-slate-400 flex items-center gap-4 pt-1 flex-wrap">
-                <span>Point Estimate: <strong className="text-rose-400">{m.conformal_metrics.point_risk_pct}%</strong></span>
+              <div className="text-xs text-slate-500 flex items-center gap-6 pt-1 flex-wrap font-mono">
+                <span>Point Risk: <strong className="text-[#210F60] font-bold">{m.conformal_metrics.point_risk_pct}%</strong></span>
                 <span>
-                  95% Interval: <strong className="text-blue-400">[{m.conformal_metrics.confidence_interval_95[0]}% — {m.conformal_metrics.confidence_interval_95[1]}%]</strong>
+                  95% Interval: <strong className="text-[#006C51] font-bold">[{m.conformal_metrics.confidence_interval_95[0]}% — {m.conformal_metrics.confidence_interval_95[1]}%]</strong>
                 </span>
-                <span>Solely Automated: <strong className="text-slate-300">FALSE</strong></span>
+                <span>Solely Automated: <strong className="text-rose-600 font-bold">FALSE (Section 37 Compliant)</strong></span>
               </div>
             </div>
           );

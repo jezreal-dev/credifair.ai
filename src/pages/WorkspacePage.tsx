@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ProfileSelector } from '../components/ProfileSelector';
 import { FinancialVitals } from '../components/FinancialVitals';
 import { ConformalRiskBar } from '../components/ConformalRiskBar';
+import { ConformalRiskTrendChart } from '../components/ConformalRiskTrendChart';
 import { ExplainabilityTabs } from '../components/ExplainabilityTabs';
 import { ComplianceSignOff } from '../components/ComplianceSignOff';
 import { PRELOADED_PROFILES } from '../data/seedData';
 import { AnalysisResponse, HealthResponse } from '../types';
-import { AlertCircle, ArrowLeft, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
+import { AlertCircle, ArrowLeft, RefreshCw, ShieldCheck, Sparkles, Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface WorkspacePageProps {
@@ -96,51 +97,51 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({ health }) => {
   };
 
   return (
-    <div id="workspace-page-root" className="min-h-screen bg-[#0B0E14] text-slate-100 pb-20 font-sans">
+    <div id="workspace-page-root" className="min-h-screen bg-[#F8FBFF] text-[#210F60] pb-24 font-sans">
       {/* Workspace Sub-header */}
-      <div className="bg-[#121824] border-b border-slate-800/80 py-2.5 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white border-b border-slate-200/80 py-3 px-4 sm:px-6 lg:px-8 sticky top-20 z-40 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-slate-100 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#1DCF9F] transition-colors"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Overview</span>
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Overview</span>
             </Link>
-            <span className="text-slate-700">/</span>
-            <span className="text-xs font-mono font-semibold text-slate-200 uppercase tracking-wide">
+            <span className="text-slate-300">/</span>
+            <span className="text-xs font-extrabold text-[#210F60] uppercase tracking-wide">
               Underwriting Studio
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
+          <div className="flex items-center gap-4 text-xs text-slate-600 font-medium">
             <span className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>NDPA 2023 §37 Active</span>
+              <ShieldCheck className="w-4 h-4 text-[#1DCF9F]" />
+              <span className="text-[#006C51] font-bold">NDPA 2023 §37 Active</span>
             </span>
-            <span>•</span>
+            <span className="text-slate-300">•</span>
             <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Model: {health?.llm_connection?.active_model || 'Gemini'}</span>
             </span>
           </div>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         {errorMessage && (
           <div
             id="workspace-error-banner"
-            className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono flex items-center justify-between gap-3 shadow-xs"
+            className="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between gap-3 shadow-xs"
           >
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <div className="flex items-center gap-2 font-medium">
+              <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
               <span>{errorMessage}</span>
             </div>
             <button
               onClick={() => loadArchetype(selectedProfileKey, loanRequested)}
-              className="px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded text-xs font-mono shadow-xs transition-colors"
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs"
             >
               Retry
             </button>
@@ -160,12 +161,12 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({ health }) => {
         />
 
         {isLoading && !analysis && (
-          <div className="p-12 text-center bg-[#121824] rounded-xl border border-slate-800/80 font-mono shadow-xs">
-            <RefreshCw className="w-6 h-6 animate-spin text-blue-400 mx-auto mb-3" />
-            <p className="text-xs font-semibold text-slate-100">
+          <div className="p-16 text-center bg-white rounded-3xl border border-slate-100 shadow-[0_4px_24px_rgba(33,15,96,0.05)]">
+            <RefreshCw className="w-8 h-8 animate-spin text-[#1DCF9F] mx-auto mb-3" />
+            <p className="text-sm font-bold text-[#210F60]">
               Calibrating Conformal Risk Intervals &amp; Dual Explanations...
             </p>
-            <p className="text-xs text-slate-400 mt-1">Applying split conformal calibration over empirical trade cycles</p>
+            <p className="text-xs text-slate-500 mt-1">Applying split conformal calibration over empirical trade cycles</p>
           </div>
         )}
 
@@ -177,10 +178,17 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({ health }) => {
             {/* 3. Conformal Prediction Range Gauge */}
             <ConformalRiskBar risk={analysis.conformal_risk} forensicAudit={analysis.forensic_audit} />
 
-            {/* 4. Dual-Language Underwriting Tabs */}
+            {/* 4. Conformal Historical Trajectory & Recharts Distribution */}
+            <ConformalRiskTrendChart
+              risk={analysis.conformal_risk}
+              vitals={analysis.merchant_vitals}
+              sampleRecords={analysis.sample_records}
+            />
+
+            {/* 5. Dual-Language Underwriting Tabs */}
             <ExplainabilityTabs explanation={analysis.llm_explanation} />
 
-            {/* 5. Section 37 Statutory Underwriting Sign-Off */}
+            {/* 6. Section 37 Statutory Underwriting Sign-Off */}
             <ComplianceSignOff vitals={analysis.merchant_vitals} risk={analysis.conformal_risk} />
           </>
         )}

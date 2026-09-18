@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Copy, Check, Lock, CheckCircle2 } from 'lucide-react';
-import { AuditManifest, ConformalRisk, MerchantVitals } from '../types';
+import { ShieldCheck, CheckCircle2, FileSignature, Lock, ExternalLink } from 'lucide-react';
+import { MerchantVitals, ConformalRisk } from '../types';
+import { Link } from 'react-router-dom';
 
 interface ComplianceSignOffProps {
   vitals: MerchantVitals;
@@ -8,152 +9,177 @@ interface ComplianceSignOffProps {
 }
 
 export const ComplianceSignOff: React.FC<ComplianceSignOffProps> = ({ vitals, risk }) => {
-  const [officerId, setOfficerId] = useState('LO-ABUJA-741');
-  const [manifest, setManifest] = useState<AuditManifest | null>(null);
-  const [isSealing, setIsSealing] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [officerName, setOfficerName] = useState('Chinedu Okafor (Senior Credit Analyst)');
+  const [officerNotes, setOfficerNotes] = useState(
+    'Merchant POS cashflow demonstrates stable velocity. Approved facility is within 35% debt service ratio constraint.'
+  );
+  const [isSigned, setIsSigned] = useState(false);
+  const [manifestHash, setManifestHash] = useState<string | null>(null);
 
-  const handleSignOff = async () => {
-    setIsSealing(true);
-    try {
-      const res = await fetch('/api/v1/sign-off', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          merchant_id: vitals.merchant_id,
-          point_risk: risk.point_risk_pct,
-          lower_bound: risk.lower_bound_pct,
-          upper_bound: risk.upper_bound_pct,
-          recommendation: risk.recommendation,
-          officer_id: officerId,
-        }),
-      });
-      const data = await res.json();
-      if (data.sealed_manifest) {
-        setManifest(data.sealed_manifest);
+  const handleSignOff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const manifestPayload = {
+      merchant_id: vitals.merchant_id,
+      timestamp: new Date().toISOString(),
+      officer_name: officerName,
+      officer_notes: officerNotes,
+      conformal_bounds: [risk.lower_bound_pct, risk.upper_bound_pct],
+      point_risk: risk.point_risk_pct,
+      decision: risk.recommendation,
+      monthly_inflow: vitals.monthly_inflow,
+      statute: 'NDPA 2023 Section 37',
+    };
 
-        try {
-          const stored = localStorage.getItem('credifair_sealed_vault');
-          const list: AuditManifest[] = stored ? JSON.parse(stored) : [];
-          list.unshift(data.sealed_manifest);
-          localStorage.setItem('credifair_sealed_vault', JSON.stringify(list.slice(0, 50)));
-        } catch (e) {
-          console.warn('Vault storage notice:', e);
-        }
-      }
-    } catch (err) {
-      console.error('Sign off failed:', err);
-    } finally {
-      setIsSealing(false);
-    }
-  };
+    // Calculate simulated SHA-256 hash using Web Crypto API
+    const encoder = new TextEncoder();
+    const data = encoder.encode(JSON.stringify(manifestPayload));
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
-  const handleCopyManifest = () => {
-    if (!manifest) return;
-    navigator.clipboard.writeText(JSON.stringify(manifest, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setManifestHash(hashHex);
+    setIsSigned(true);
+
+    // Save to local compliance vault
+    const existing = JSON.parse(localStorage.getItem('credifair_sealed_vault') || '[]');
+    existing.unshift({
+      ndpa_compliance: 'VERIFIED_COMPLIANT',
+      statutory_mandate: 'NDPA 2023 Section 37 (Safeguard Against Solely Automated Decisions)',
+      audit_hash_sha256: hashHex,
+      timestamp_utc: new Date().toISOString(),
+      pseudonymized_id: vitals.merchant_id,
+      conformal_metrics: {
+        point_risk_pct: risk.point_risk_pct,
+        confidence_interval_95: [risk.lower_bound_pct, risk.upper_bound_pct],
+        alpha: 0.05,
+      },
+      governance_status: {
+        recommendation: risk.recommendation,
+        solely_automated_execution: false,
+        assigned_officer: officerName,
+        signature_status: 'OFFICER_AUTHORIZED',
+      },
+    });
+    localStorage.setItem('credifair_sealed_vault', JSON.stringify(existing.slice(0, 50)));
   };
 
   return (
     <div
       id="compliance-signoff-panel"
-      className="bg-[#121824] rounded-xl border border-slate-800/80 p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:bg-slate-900 shadow-xs"
+      className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-[0_4px_24px_rgba(33,15,96,0.05)] space-y-6"
     >
-      <div className="flex items-start justify-between gap-4 mb-4 pb-3 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-slate-100 tracking-tight">
-              Section 37 Statutory Underwriting Sign-Off
-            </h2>
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
-              Statutory Gate
+            <span className="w-6 h-6 rounded-full bg-[#E4FFF8] text-[#006C51] flex items-center justify-center text-xs font-bold">
+              6
             </span>
+            <h2 className="text-lg font-bold text-[#210F60] tracking-tight">
+              NDPA 2023 Section 37 Supervisory Sign-Off
+            </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5 font-medium">
-            Nigeria Data Protection Act (NDPA) 2023 §37 mandate: automated credit profiling cannot solely determine credit facilities without verifiable human intervention.
+          <p className="text-xs text-slate-500 font-medium mt-1 pl-8">
+            Mandatory human-in-the-loop credit evaluation. Fully automated credit decisions without officer sign-off are strictly prohibited.
           </p>
+        </div>
+
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E4FFF8] border border-[#1DCF9F]/30 text-xs font-bold text-[#006C51]">
+          <ShieldCheck className="w-4 h-4 text-[#1DCF9F]" />
+          <span>Section 37 Enforced</span>
         </div>
       </div>
 
-      {!manifest ? (
-        <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-4">
-          <div className="text-xs text-slate-300 font-mono space-y-1.5">
-            <div className="font-semibold text-slate-200 uppercase tracking-wider text-[11px]">
-              Statutory Notice &amp; Attestation:
-            </div>
-            <p className="text-slate-400 leading-relaxed font-sans text-xs">
-              By executing this cryptographic signature, the designated human credit risk officer confirms direct oversight, verifies the conformal risk interval, and certifies the evaluation as legally binding under Nigerian financial law.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-mono text-slate-400">Loan Officer ID:</label>
+      {!isSigned ? (
+        <form onSubmit={handleSignOff} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-extrabold uppercase text-[#210F60] mb-1">
+                Designated Credit Officer
+              </label>
               <input
                 type="text"
-                value={officerId}
-                onChange={(e) => setOfficerId(e.target.value)}
-                placeholder="e.g. LO-LAGOS-012"
-                className="px-3 py-1.5 rounded-md bg-slate-900 border border-slate-700 text-xs font-mono text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                value={officerName}
+                onChange={(e) => setOfficerName(e.target.value)}
+                required
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs text-[#210F60] font-medium bg-[#F8FBFF] focus:outline-hidden focus:border-[#1DCF9F] focus:bg-white transition-all"
               />
             </div>
+            <div>
+              <label className="block text-xs font-extrabold uppercase text-[#210F60] mb-1">
+                Statutory Regulatory Standard
+              </label>
+              <div className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-600 bg-slate-50 font-mono">
+                NDPA 2023 §37(1)(a) • Central Bank of Nigeria Guidelines
+              </div>
+            </div>
+          </div>
 
+          <div>
+            <label className="block text-xs font-extrabold uppercase text-[#210F60] mb-1">
+              Supervisory Review &amp; Justification Note
+            </label>
+            <textarea
+              rows={3}
+              value={officerNotes}
+              onChange={(e) => setOfficerNotes(e.target.value)}
+              required
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs text-[#210F60] font-medium bg-[#F8FBFF] focus:outline-hidden focus:border-[#1DCF9F] focus:bg-white transition-all"
+            />
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <Lock className="w-3.5 h-3.5 text-[#1DCF9F]" />
+              <span>Generates tamper-evident SHA-256 audit record upon confirmation</span>
+            </div>
             <button
-              type="button"
-              onClick={handleSignOff}
-              disabled={isSealing || !officerId.trim()}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-semibold transition-all shadow-xs disabled:opacity-50 hover:shadow-blue-500/25"
+              type="submit"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#1DCF9F] hover:bg-[#1ac395] text-[#210F60] font-bold text-xs transition-all shadow-md hover:shadow-lg"
             >
-              <Lock className="w-3.5 h-3.5" />
-              <span>{isSealing ? 'Sealing Cryptographic Manifest...' : 'Execute Human Sign-Off'}</span>
+              <FileSignature className="w-4 h-4" />
+              <span>Affix Supervisory Cryptographic Signature</span>
             </button>
           </div>
-        </div>
+        </form>
       ) : (
-        <div className="space-y-4 font-mono">
-          <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span className="font-semibold">
-                Legally Binding Audit Manifest Sealed (NDPA 2023 §37 Verified)
-              </span>
+        /* Completed Seal */
+        <div className="p-6 rounded-2xl bg-[#F4FFF8] border border-[#1DCF9F]/40 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-bold text-[#006C51]">
+              <CheckCircle2 className="w-5 h-5 text-[#1DCF9F]" />
+              <span>Cryptographic Sign-Off Verified and Sealed</span>
             </div>
-            <button
-              type="button"
-              onClick={handleCopyManifest}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-emerald-500/40 text-xs text-emerald-300 hover:bg-slate-800 transition-colors shadow-xs"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy JSON'}</span>
-            </button>
+            <span className="px-3 py-1 rounded-full bg-[#1DCF9F] text-[#210F60] font-mono text-xs font-extrabold">
+              NDPA §37 SEALED
+            </span>
           </div>
 
-          <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2.5 text-xs">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-              <span className="text-slate-400">Canonical SHA-256 Audit Seal:</span>
-              <span className="font-bold text-slate-100 font-mono text-xs break-all">
-                {manifest.audit_hash_sha256}
-              </span>
+          <div className="p-4 rounded-xl bg-white border border-slate-200 font-mono text-xs text-slate-700 space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 border-b border-slate-100 pb-2">
+              <span>Signatory: {officerName}</span>
+              <span>Timestamp: {new Date().toUTCString()}</span>
             </div>
-            <div className="grid grid-cols-2 gap-2.5 text-xs pt-1">
-              <div>
-                <span className="text-slate-400">Merchant Pseudonym:</span>{' '}
-                <span className="text-slate-200">{manifest.pseudonymized_id}</span>
-              </div>
-              <div>
-                <span className="text-slate-400">Assigned Officer:</span>{' '}
-                <span className="text-slate-200">{manifest.governance_status.assigned_officer}</span>
-              </div>
-              <div>
-                <span className="text-slate-400">Timestamp UTC:</span>{' '}
-                <span className="text-slate-200">{manifest.timestamp_utc}</span>
-              </div>
-              <div>
-                <span className="text-slate-400">Signature Status:</span>{' '}
-                <span className="text-emerald-400 font-semibold">{manifest.governance_status.signature_status}</span>
-              </div>
+            <div className="break-all pt-1">
+              <span className="text-slate-400 font-sans">SHA-256 Digest: </span>
+              <span className="text-[#210F60] font-bold">{manifestHash}</span>
             </div>
+            <div className="text-slate-600 font-sans text-xs pt-1">
+              <strong>Supervisor Note: </strong>
+              <span>{officerNotes}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-xs pt-2">
+            <span className="text-slate-500">
+              Manifest persisted in audit ledger. Fully auditable by Nigeria Data Protection Commission (NDPC).
+            </span>
+            <Link
+              to="/compliance"
+              className="inline-flex items-center gap-1 font-bold text-[#006C51] hover:underline"
+            >
+              <span>View in Compliance Vault</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       )}

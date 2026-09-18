@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Upload, Users, FileSpreadsheet, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Upload, Users, FileSpreadsheet, CheckCircle2, ChevronRight, ShieldCheck } from 'lucide-react';
 import { PRELOADED_PROFILES } from '../data/seedData';
 
 interface ProfileSelectorProps {
@@ -61,39 +61,44 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
   return (
     <div
       id="profile-selector-panel"
-      className="bg-[#121824] rounded-xl border border-slate-800/80 p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:bg-slate-900 shadow-xs"
+      className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-[0_4px_24px_rgba(33,15,96,0.05)] space-y-6"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div>
-          <h2 className="text-sm font-semibold text-slate-100 tracking-tight">
-            1. Merchant Ingestion &amp; Statement Selection
-          </h2>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">
-            Select an authentic Nigerian market profile or ingest a raw bank or POS statement
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#E4FFF8] text-[#006C51] flex items-center justify-center text-xs font-bold">
+              1
+            </span>
+            <h2 className="text-lg font-bold text-[#210F60] tracking-tight">
+              Merchant Profile &amp; Statement Selection
+            </h2>
+          </div>
+          <p className="text-xs text-slate-500 mt-1 pl-8 font-medium">
+            Select a verified Nigerian MSME archetype or ingest a raw bank / POS transaction statement
           </p>
         </div>
 
-        {/* Modern Segmented Control */}
-        <div className="inline-flex p-1 rounded-lg bg-slate-950 border border-slate-800 self-start sm:self-auto">
+        {/* OPay Styled Segmented Switcher */}
+        <div className="inline-flex p-1 rounded-full bg-[#F4F7FC] border border-slate-200/60 self-start sm:self-auto">
           <button
             type="button"
             onClick={() => onModeChange('archetype')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               mode === 'archetype'
-                ? 'bg-slate-800 text-slate-100 border border-slate-700/80 shadow-xs'
-                : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                ? 'bg-[#1DCF9F] text-[#210F60] shadow-sm'
+                : 'text-slate-600 hover:text-[#210F60]'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Verified Archetypes</span>
+            <span>Market Archetypes</span>
           </button>
           <button
             type="button"
             onClick={() => onModeChange('upload')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               mode === 'upload'
-                ? 'bg-slate-800 text-slate-100 border border-slate-700/80 shadow-xs'
-                : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                ? 'bg-[#1DCF9F] text-[#210F60] shadow-sm'
+                : 'text-slate-600 hover:text-[#210F60]'
             }`}
           >
             <Upload className="w-3.5 h-3.5" />
@@ -103,8 +108,8 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
       </div>
 
       {mode === 'archetype' ? (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {Object.entries(PRELOADED_PROFILES).map(([key, p]) => {
               const isSelected = selectedProfileKey === key;
               return (
@@ -113,45 +118,45 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                   type="button"
                   onClick={() => onProfileSelect(key)}
                   disabled={isLoading}
-                  className={`p-4 rounded-lg text-left transition-all border flex flex-col justify-between ${
+                  className={`p-5 rounded-2xl text-left transition-all border flex flex-col justify-between relative overflow-hidden ${
                     isSelected
-                      ? 'bg-slate-900 border-blue-500/60 text-slate-100 shadow-xs ring-1 ring-blue-500/40'
-                      : 'bg-slate-950/70 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-slate-900/60'
+                      ? 'bg-gradient-to-b from-[#F4FFF8] to-white border-[#1DCF9F] shadow-[0_6px_20px_rgba(29,207,159,0.18)] ring-2 ring-[#1DCF9F]'
+                      : 'bg-white border-slate-200 hover:border-[#1DCF9F]/60 hover:shadow-md'
                   }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-bold text-slate-100 font-sans">{p.name}</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-extrabold text-[#210F60]">{p.name}</span>
                       {isSelected ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <CheckCircle2 className="w-5 h-5 text-[#1DCF9F] shrink-0" />
                       ) : (
-                        <div className="w-3 h-3 rounded-full border border-slate-700" />
+                        <div className="w-4 h-4 rounded-full border-2 border-slate-300" />
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-400 font-sans line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
                       {p.driver}
                     </p>
                   </div>
-                  <div className="mt-3.5 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-300">
-                    <span className="text-slate-200 font-medium">Inflow: ₦{(p.monthly_inflow / 1000).toFixed(0)}k/mo</span>
-                    <span className="text-slate-400">Vol: {p.volatility}%</span>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                    <span className="font-bold text-[#210F60]">₦{(p.monthly_inflow / 1000).toFixed(0)}k/mo Inflow</span>
+                    <span className="text-slate-500">{p.volatility}% Vol</span>
                   </div>
                 </button>
               );
             })}
           </div>
 
-          {/* Requested Facility Slider & Input */}
-          <div className="p-4 rounded-lg bg-slate-950/80 border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Requested Facility Slider with OPay Green Accent */}
+          <div className="p-5 rounded-2xl bg-[#F8FBFF] border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <label className="text-xs font-medium uppercase tracking-wider text-slate-300 font-mono">
-                Requested Facility Limit (₦)
+              <label className="text-xs font-extrabold uppercase tracking-wider text-[#210F60]">
+                Requested Working Capital Limit
               </label>
-              <p className="text-xs text-slate-400 font-sans">
-                Adjust target credit facility to simulate underwriting stress testing
+              <p className="text-xs text-slate-500 font-medium">
+                Adjust credit facility to simulate underwriting stress test and debt-service bounds
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <input
                 type="range"
                 min={200000}
@@ -159,25 +164,25 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                 step={50000}
                 value={loanRequested}
                 onChange={(e) => onLoanRequestedChange(Number(e.target.value))}
-                className="w-36 sm:w-48 accent-blue-500 cursor-pointer"
+                className="w-36 sm:w-52 accent-[#1DCF9F] cursor-pointer h-2 bg-slate-200 rounded-lg"
               />
-              <div className="px-3 py-1.5 rounded bg-slate-900 border border-slate-700 text-xs font-mono font-bold text-slate-50 tabular-nums">
+              <div className="px-4 py-2 rounded-xl bg-white border border-[#1DCF9F] text-sm font-extrabold text-[#210F60] font-mono shadow-xs tabular-nums">
                 ₦{loanRequested.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
           </div>
         </div>
       ) : (
-        /* Ingestion Dropzone per Directive #3.C */
+        /* OPay Statement Dropzone */
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
+          className={`border-2 border-dashed rounded-3xl p-10 text-center cursor-pointer transition-all ${
             isDragging
-              ? 'border-blue-500 bg-blue-950/30 shadow-[0_0_20px_rgba(59,130,246,0.15)]'
-              : 'border-slate-700/80 bg-slate-900/40 hover:border-blue-500/60 hover:bg-slate-900/80'
+              ? 'border-[#1DCF9F] bg-[#E4FFF8]/40 shadow-lg'
+              : 'border-slate-200 bg-[#F8FBFF] hover:border-[#1DCF9F] hover:bg-white'
           }`}
         >
           <input
@@ -188,20 +193,19 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
             className="hidden"
           />
 
-          {/* Soft blue circular badge wrapping the upload icon */}
-          <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mx-auto mb-3 text-blue-400 shadow-sm">
-            <Upload className="w-5 h-5" />
+          <div className="w-14 h-14 rounded-full bg-[#E4FFF8] border border-[#1DCF9F]/30 flex items-center justify-center mx-auto mb-3 text-[#006C51] shadow-xs">
+            <Upload className="w-6 h-6" />
           </div>
 
-          <h3 className="text-xs font-semibold text-slate-100 font-mono mb-1">
-            Drop raw CSV, TXT, or PDF bank statement here
+          <h3 className="text-sm font-bold text-[#210F60] mb-1">
+            Drop raw CSV, TXT, or PDF bank / POS statement here
           </h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto font-sans leading-relaxed">
-            5MB maximum file size. Deterministic PII sanitization (BVN, phone numbers, customer accounts) executes automatically before feature extraction.
+          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            5MB maximum size. Automated deterministic PII scrubbing (BVN, phone numbers, customer accounts) executes automatically before feature extraction per NDPA 2023 §24.
           </p>
 
-          <div className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-slate-800/90 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-200 transition-colors shadow-xs">
-            <FileSpreadsheet className="w-3.5 h-3.5 text-blue-400" />
+          <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#210F60] hover:bg-[#2c1b75] text-white text-xs font-bold transition-colors shadow-sm">
+            <FileSpreadsheet className="w-4 h-4 text-[#1DCF9F]" />
             <span>Browse Statement File</span>
           </div>
         </div>

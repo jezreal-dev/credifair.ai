@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { ShieldCheck, Cpu, Sparkles, Menu, X, ArrowRight } from 'lucide-react';
+import {
+  Menu,
+  X,
+  ArrowRight,
+  ShieldCheck,
+  CreditCard,
+} from 'lucide-react';
 import { HealthResponse } from '../types';
+import { BrandLogo } from './BrandLogo';
 
 interface NavbarProps {
   health: HealthResponse | null;
@@ -10,91 +17,82 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ health }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { to: '/', label: 'Overview', end: true },
-    { to: '/app', label: 'Underwriting Studio' },
-    { to: '/ledger', label: 'Ledger & Forensic Inspector' },
-    { to: '/compliance', label: 'Compliance Manifest Vault' },
-  ];
-
   return (
     <header
       id="main-navbar"
-      className="bg-[#0B0E14] border-b border-slate-800/80 sticky top-0 z-50 text-slate-100 backdrop-blur-md"
+      className="bg-white border-b border-slate-100 sticky top-0 z-50 text-[#210F60] shadow-[0_2px_12px_rgba(33,15,96,0.04)]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 gap-4">
-          {/* Brand Logo & Institutional Tag */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-blue-400 group-hover:border-blue-500/40 group-hover:text-blue-300 transition-colors shadow-xs">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold tracking-tight text-slate-100 font-mono">
-                CrediFair AI
-              </span>
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-900/80 text-slate-400 border border-slate-800">
-                NDPA 2023 §37
-              </span>
-            </div>
+        <div className="flex items-center justify-between h-20 gap-4">
+          {/* Custom Brand Logo */}
+          <Link to="/" className="flex items-center gap-3 shrink-0">
+            <BrandLogo size={40} />
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 bg-[#121824]/90 p-1 rounded-lg border border-slate-800/80">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.end}
-                className={({ isActive }) =>
-                  `px-3 py-1 rounded text-xs font-medium transition-all ${
-                    isActive
-                      ? 'bg-slate-800 text-slate-100 border border-slate-700/80 shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent'
-                  }`
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
+          <nav className="hidden lg:flex items-center gap-7 text-[15px] font-semibold text-[#210F60]">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `transition-colors hover:text-[#1DCF9F] ${
+                  isActive ? 'text-[#1DCF9F]' : 'text-[#210F60]'
+                }`
+              }
+            >
+              Overview
+            </NavLink>
+
+            <NavLink
+              to="/app"
+              className={({ isActive }) =>
+                `transition-colors hover:text-[#1DCF9F] flex items-center gap-1.5 ${
+                  isActive ? 'text-[#1DCF9F]' : 'text-[#210F60]'
+                }`
+              }
+            >
+              <span>Underwriting Studio</span>
+              <span className="bg-[#1DCF9F]/15 text-[#006c51] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                LIVE
+              </span>
+            </NavLink>
+
+            <NavLink
+              to="/ledger"
+              className={({ isActive }) =>
+                `transition-colors hover:text-[#1DCF9F] ${
+                  isActive ? 'text-[#1DCF9F]' : 'text-[#210F60]'
+                }`
+              }
+            >
+              Sanitized Ledger
+            </NavLink>
+
+            <NavLink
+              to="/compliance"
+              className={({ isActive }) =>
+                `transition-colors hover:text-[#1DCF9F] ${
+                  isActive ? 'text-[#1DCF9F]' : 'text-[#210F60]'
+                }`
+              }
+            >
+              Compliance Vault
+            </NavLink>
           </nav>
 
-          {/* Right Status Pills & Quick CTA */}
-          <div className="hidden lg:flex items-center gap-2">
-            {/* Calibration Status */}
-            <div
-              id="engine-calibration-pill"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#121824] text-[11px] font-mono border border-slate-800"
-              title="Inductive split conformal prediction calibrated on empirical Nigerian MSME trade cycles"
-            >
-              <Cpu className="w-3.5 h-3.5 text-blue-400" />
-              <span className="text-slate-400">Coverage:</span>
-              <span className="font-semibold text-emerald-400">95% MAPIE</span>
+          {/* Right CTAs */}
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-2 bg-[#F8FBFF] border border-[#1DCF9F]/20 px-3 py-1.5 rounded-full text-xs font-medium text-[#210F60]">
+              <ShieldCheck className="w-4 h-4 text-[#1DCF9F]" />
+              <span>Zero Landed Collateral Credit</span>
             </div>
 
-            {/* LLM Status Badge */}
-            <div
-              id="llm-connection-pill"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#121824] text-[11px] font-mono border border-slate-800"
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  health?.llm_connection?.is_connected ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-400'
-                }`}
-              />
-              <span className="text-slate-400">API:</span>
-              <span className="font-semibold text-slate-200 uppercase">
-                {health?.llm_connection?.status_badge || 'LIVE'}
-              </span>
-            </div>
-
-            {/* Quick Action Button */}
             <Link
               to="/app"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors ml-1 font-mono shadow-xs hover:shadow-blue-500/20"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#1DCF9F] hover:bg-[#1ac395] text-[#210F60] font-bold text-sm transition-all shadow-[0_4px_14px_rgba(29,207,159,0.3)] hover:shadow-[0_6px_20px_rgba(29,207,159,0.4)]"
             >
               <span>Launch Studio</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -103,42 +101,71 @@ export const Navbar: React.FC<NavbarProps> = ({ health }) => {
             id="mobile-menu-toggle"
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800"
+            className="lg:hidden p-2 rounded-lg text-[#210F60] hover:bg-slate-100 transition-colors"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#121824] border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.end}
-              onClick={() => setMobileMenuOpen(false)}
-              className={({ isActive }) =>
-                `block px-3 py-2 rounded text-xs font-medium ${
-                  isActive
-                    ? 'bg-slate-800 text-slate-100 border border-slate-700'
-                    : 'text-slate-400 hover:bg-slate-900'
-                }`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
+        <div className="lg:hidden bg-white border-t border-slate-100 px-5 pt-3 pb-6 space-y-3 shadow-lg">
+          <NavLink
+            to="/"
+            end
+            onClick={() => setMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              `block px-3 py-2.5 rounded-xl font-semibold text-sm ${
+                isActive ? 'bg-[#F4FFF8] text-[#1DCF9F]' : 'text-[#210F60] hover:bg-slate-50'
+              }`
+            }
+          >
+            Overview
+          </NavLink>
+          <NavLink
+            to="/app"
+            onClick={() => setMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              `block px-3 py-2.5 rounded-xl font-semibold text-sm ${
+                isActive ? 'bg-[#F4FFF8] text-[#1DCF9F]' : 'text-[#210F60] hover:bg-slate-50'
+              }`
+            }
+          >
+            Underwriting Studio
+          </NavLink>
+          <NavLink
+            to="/ledger"
+            onClick={() => setMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              `block px-3 py-2.5 rounded-xl font-semibold text-sm ${
+                isActive ? 'bg-[#F4FFF8] text-[#1DCF9F]' : 'text-[#210F60] hover:bg-slate-50'
+              }`
+            }
+          >
+            Sanitized Ledger
+          </NavLink>
+          <NavLink
+            to="/compliance"
+            onClick={() => setMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              `block px-3 py-2.5 rounded-xl font-semibold text-sm ${
+                isActive ? 'bg-[#F4FFF8] text-[#1DCF9F]' : 'text-[#210F60] hover:bg-slate-50'
+              }`
+            }
+          >
+            Compliance Manifest Vault
+          </NavLink>
 
-          <div className="pt-2 border-t border-slate-800 flex flex-col gap-2">
+          <div className="pt-3 border-t border-slate-100">
             <Link
               to="/app"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2 rounded bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs font-mono mt-1"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-full bg-[#1DCF9F] text-[#210F60] font-bold text-sm shadow-md"
             >
-              Open Underwriting Studio
+              <span>Launch Studio</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
