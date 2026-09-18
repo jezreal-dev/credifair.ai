@@ -7,7 +7,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-v2.0-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Conformal Prediction](https://img.shields.io/badge/MAPIE-Conformal%2095%25-green.svg)](https://mapie.readthedocs.io/)
 [![Compliance](https://img.shields.io/badge/NDPA%202023-%C2%A737%20Compliant-success.svg)](https://ndpc.gov.ng/)
-[![Tests](https://img.shields.io/badge/pytest-13%20passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/pytest-19%20passed-brightgreen.svg)]()
 
 ---
 
@@ -45,16 +45,17 @@ The system couples these statistical bounds with a dual-language large language 
 * **Formula Neutralization:** Neutralizes CSV Formula Injection (CWE-1236 / DDE) on exported transaction records.
 
 ### 4. Dual-Language Explainability Gateway (`credifair_explainability.py`)
-* **Multi-Provider Support:** Dynamic auto-routing across Groq Cloud (`Llama-3.3-70b-versatile`), Google Gemini (`Gemini-2.5-flash`), Fireworks AI (`Llama-v3p3-70b-instruct`), or an internal deterministic fallback engine.
+* **Multi-Provider Support:** Automated routing across Groq Cloud (`Llama-3.3-70b-versatile`), Google Gemini (`Gemini-2.5-flash`), Fireworks AI (`Llama-v3p3-70b-instruct`), or an internal deterministic fallback engine.
 * **Dual Output Formatting:**
   * **Credit Officer Audit Report:** Formal financial English detailing variance triggers, liquidity indices, and debt-service capacity.
   * **Merchant Advisory:** Localized Nigerian Pidgin translating financial metrics into operational cash-flow guidance.
 
 ### 5. Ingestion and Presentation Interfaces
 * **Ingestion Pipeline (`credifair_ingestion.py` & `credifair_parser.py`):** Ingests unstructured CSV ledgers and PDF exports using `decimal.Decimal` arithmetic with `ROUND_HALF_UP` to eliminate floating-point currency drift.
+* **Forensic Guard (`credifair_forensics.py`):** Identifies round-trip transfers, artificial wash trading, turnover concentration spikes, and velocity deficits.
 * **Headless REST API (`api.py`):** Exposes FastAPI endpoints with Cross-Origin Resource Sharing (CORS) enabled for external web clients (e.g., Lovable React/Tailwind frontends).
 * **Verification Dashboard (`app.py`):** Local Streamlit interface for internal evaluation and audit reviews.
-* **CLI Audit Tool (`run_live_audit.py`):** Command-line verification harness for instant file audits.
+* **CLI Audit Tool (`run_live_audit.py`):** Command-line verification tool for instant file audits.
 
 ---
 
@@ -67,10 +68,11 @@ credifair-ai/
 ├── credifair_compliance.py     # NDPA 2023 Section 37 compliance interceptor & PII scrubber
 ├── credifair_engine.py         # XGBoost and MAPIE conformal prediction logic
 ├── credifair_explainability.py # Multi-provider LLM explainability router
+├── credifair_forensics.py      # Forensic wash trading & transaction anomaly detector
 ├── credifair_ingestion.py      # Decoupled Decimal financial pipeline & feature extraction
 ├── credifair_parser.py         # Multi-format CSV and PDF statement parser
 ├── credifair_security.py       # Input validation, CWE defenses, and prompt injection filters
-├── run_live_audit.py           # End-to-end CLI statement audit harness
+├── run_live_audit.py           # End-to-end CLI statement audit tool
 ├── requirements.txt            # Pinned system dependencies
 ├── seed_data.py                # Deterministic validation profiles & merchant archetypes
 ├── LICENSE                     # Apache License, Version 2.0
@@ -78,6 +80,7 @@ credifair-ai/
 └── tests/
     ├── __init__.py
     ├── test_credifair.py       # Unit tests for ML bounds, PII sanitization, and security
+    ├── test_forensics.py       # Unit tests for wash trading and volume concentration
     ├── test_api.py             # Core FastAPI endpoint tests
     └── test_api_llm.py         # Integration tests for API, CORS, and provider routing
 ```
@@ -141,14 +144,14 @@ Access the application at `http://localhost:8501`.
 
 ### Run a Live Statement Audit via CLI
 ```bash
-python run_live_audit.py --file sample_bodija_market_statement.csv --merchant-name "Mama Bukky Foodstuff"
+python run_live_audit.py --file sample_bodija_market_statement.csv --merchant-name "Bodija Retail Archetype"
 ```
 
 ---
 
 ## Automated Testing
 
-Execute the test harness to verify statistical monotonicity, conformal coverage, PII redaction, file upload constraints, and API status codes:
+Execute the test suite to verify statistical monotonicity, conformal coverage, PII redaction, file upload constraints, and API status codes:
 
 ```bash
 pytest tests/ -v
