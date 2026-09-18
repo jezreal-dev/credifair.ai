@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Upload, Users, FileSpreadsheet, RefreshCw, CheckCircle2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Upload, Users, FileSpreadsheet, CheckCircle2, ChevronRight, ShieldCheck } from 'lucide-react';
 import { ARCHETYPE_PROFILES } from '../data/seedData';
 
 interface ProfileSelectorProps {
@@ -23,163 +23,194 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
   onFileUpload,
   isLoading,
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      onFileUpload(e.dataTransfer.files[0]);
+      validateAndUpload(e.dataTransfer.files[0]);
     }
+  };
+
+  const validateAndUpload = (file: File) => {
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(`File size exceeds 5MB ceiling (${(file.size / 1024 / 1024).toFixed(2)} MB). Please upload a smaller file.`);
+      return;
+    }
+    onFileUpload(file);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      onFileUpload(e.target.files[0]);
+      validateAndUpload(e.target.files[0]);
     }
   };
 
   return (
-    <div id="profile-selector-panel" className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+    <div
+      id="profile-selector-panel"
+      className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-[0_4px_24px_rgba(33,15,96,0.05)] space-y-6"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div>
-          <h2 className="text-base font-semibold text-slate-900">1. Merchant Ingestion &amp; Profile</h2>
-          <p className="text-xs text-slate-500">
-            Select an authentic Nigerian market profile or ingest a raw bank/POS statement
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#E4FFF8] text-[#006C51] flex items-center justify-center text-xs font-bold">
+              1
+            </span>
+            <h2 className="text-lg font-bold text-[#210F60] tracking-tight">
+              Merchant Profile &amp; Statement Selection
+            </h2>
+          </div>
+          <p className="text-xs text-slate-500 mt-1 pl-8 font-medium">
+            Select a verified Nigerian MSME archetype or ingest a raw bank / POS transaction statement
           </p>
         </div>
 
-        {/* Tab switch */}
-        <div className="inline-flex rounded-lg p-1 bg-slate-100 border border-slate-200 text-xs font-medium self-start sm:self-auto">
+        {/* OPay Styled Segmented Switcher */}
+        <div className="inline-flex p-1 rounded-full bg-[#F4F7FC] border border-slate-200/60 self-start sm:self-auto">
           <button
-            id="tab-archetype"
             type="button"
             onClick={() => onModeChange('archetype')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               mode === 'archetype'
-                ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#1DCF9F] text-[#210F60] shadow-sm'
+                : 'text-slate-600 hover:text-[#210F60]'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Pre-loaded Archetypes</span>
+            <span>Market Archetypes</span>
           </button>
           <button
-            id="tab-upload"
             type="button"
             onClick={() => onModeChange('upload')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold transition-all ${
               mode === 'upload'
-                ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#1DCF9F] text-[#210F60] shadow-sm'
+                : 'text-slate-600 hover:text-[#210F60]'
             }`}
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>Upload Raw CSV / Ledger</span>
+            <span>Upload Statement</span>
           </button>
         </div>
       </div>
 
       {mode === 'archetype' ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {Object.entries(ARCHETYPE_PROFILES).map(([key, profile]) => {
-            const isSelected = selectedProfileKey === key;
-            return (
-              <button
-                key={key}
-                id={`profile-card-${profile.csv_key}`}
-                type="button"
-                onClick={() => onProfileSelect(key)}
-                className={`text-left p-4 rounded-xl border transition-all relative ${
-                  isSelected
-                    ? 'border-blue-600 bg-blue-50/40 shadow-xs ring-1 ring-blue-500'
-                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 bg-white'
-                }`}
-              >
-                {isSelected && (
-                  <CheckCircle2 className="w-4 h-4 text-blue-600 absolute top-3.5 right-3.5" />
-                )}
-                <div className="font-semibold text-sm text-slate-900 pr-6">{key}</div>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{profile.driver}</p>
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {Object.entries(ARCHETYPE_PROFILES).map(([key, p]) => {
+              const isSelected = selectedProfileKey === key;
+              return (
+                <button
+                  key={key}
+                  id={`profile-card-${p.csv_key}`}
+                  type="button"
+                  onClick={() => onProfileSelect(key)}
+                  disabled={isLoading}
+                  className={`p-5 rounded-2xl text-left transition-all border flex flex-col justify-between relative overflow-hidden ${
+                    isSelected
+                      ? 'bg-gradient-to-b from-[#F4FFF8] to-white border-[#1DCF9F] shadow-[0_6px_20px_rgba(29,207,159,0.18)] ring-2 ring-[#1DCF9F]'
+                      : 'bg-white border-slate-200 hover:border-[#1DCF9F]/60 hover:shadow-md'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-extrabold text-[#210F60]">{p.name}</span>
+                      {isSelected ? (
+                        <CheckCircle2 className="w-5 h-5 text-[#1DCF9F] shrink-0" />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full border-2 border-slate-300" />
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                      {p.driver}
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                    <span className="font-bold text-[#210F60]">₦{(p.monthly_inflow / 1000).toFixed(0)}k/mo Inflow</span>
+                    <span className="text-slate-500">{p.volatility}% Vol</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Inflow:</span>
-                  <span className="font-medium text-slate-800">
-                    ₦{(profile.monthly_inflow / 1000).toFixed(0)}k/mo
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-1">
-                  <span className="text-slate-500">Volatility:</span>
-                  <span className="font-medium text-slate-800">{profile.volatility}%</span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-1">
-                  <span className="text-slate-500">Velocity:</span>
-                  <span className="font-medium text-slate-800">{profile.daily_tx} tx/day</span>
-                </div>
-              </button>
-            );
-          })}
+          {/* Requested Facility Slider with OPay Green Accent */}
+          <div className="p-5 rounded-2xl bg-[#F8FBFF] border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <label className="text-xs font-extrabold uppercase tracking-wider text-[#210F60]">
+                Requested Working Capital Limit
+              </label>
+              <p className="text-xs text-slate-500 font-medium">
+                Adjust credit facility to simulate underwriting stress test and debt-service bounds
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min={200000}
+                max={5000000}
+                step={50000}
+                value={loanRequested}
+                onChange={(e) => onLoanRequestedChange(Number(e.target.value))}
+                className="w-36 sm:w-52 accent-[#1DCF9F] cursor-pointer h-2 bg-slate-200 rounded-lg"
+              />
+              <div className="px-4 py-2 rounded-xl bg-white border border-[#1DCF9F] text-sm font-extrabold text-[#210F60] font-mono shadow-xs tabular-nums">
+                ₦{loanRequested.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
+        /* OPay Statement Dropzone */
         <div
-          id="dropzone-area"
           onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-6 text-center cursor-pointer bg-slate-50/60 hover:bg-blue-50/20 transition-all"
+          className={`border-2 border-dashed rounded-3xl p-10 text-center cursor-pointer transition-all ${
+            isDragging
+              ? 'border-[#1DCF9F] bg-[#E4FFF8]/40 shadow-lg'
+              : 'border-slate-200 bg-[#F8FBFF] hover:border-[#1DCF9F] hover:bg-white'
+          }`}
         >
           <input
             ref={fileInputRef}
             type="file"
-            accept=".csv,.txt"
+            accept=".csv,.txt,.pdf"
             onChange={handleFileInputChange}
             className="hidden"
-            id="file-upload-input"
           />
-          <div className="w-12 h-12 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
-            <FileSpreadsheet className="w-6 h-6" />
+
+          <div className="w-14 h-14 rounded-full bg-[#E4FFF8] border border-[#1DCF9F]/30 flex items-center justify-center mx-auto mb-3 text-[#006C51] shadow-xs">
+            <Upload className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-semibold text-slate-900">Upload Bank or POS Transaction Ledger</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-            Drop your CSV file here or click to browse (Max 5MB per CWE-400 policy). Columns will be deep-scrubbed for
-            PII minimization per NDPA Section 24.
+
+          <h3 className="text-sm font-bold text-[#210F60] mb-1">
+            Drop raw CSV, TXT, or PDF bank / POS statement here
+          </h3>
+          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            5MB maximum size. Automated deterministic PII scrubbing (BVN, phone numbers, customer accounts) executes automatically before feature extraction per NDPA 2023 §24.
           </p>
-          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-slate-200 text-xs text-slate-600 font-medium">
-            <span>Supported: OPay, Moniepoint, PalmPay, GTB, Access CSVs</span>
+
+          <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#210F60] hover:bg-[#2c1b75] text-white text-xs font-bold transition-colors shadow-sm">
+            <FileSpreadsheet className="w-4 h-4 text-[#1DCF9F]" />
+            <span>Browse Statement File</span>
           </div>
         </div>
       )}
-
-      {/* Loan Request input adjustment */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-slate-600">
-          <span>Target Loan Facility Request:</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">₦</span>
-            <input
-              id="loan-amount-input"
-              type="number"
-              min={50000}
-              max={50000000}
-              step={50000}
-              value={loanRequested}
-              onChange={(e) => onLoanRequestedChange(Number(e.target.value) || 0)}
-              className="pl-7 pr-3 py-1.5 w-44 rounded-lg border border-slate-300 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          {isLoading && (
-            <div className="flex items-center gap-1.5 text-xs text-blue-600 font-medium">
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Analyzing...</span>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { createServer as createViteServer } from 'vite';
 import { defaultEngine } from './server/engine';
 import { CrediFairComplianceGuard } from './server/compliance';
 import { RealDocumentParser } from './server/parser';
+import { ForensicRiskGuard } from './server/forensics';
 import { getActiveLlmProvider, generateDualLanguageExplanation } from './server/explainability';
 import { PRELOADED_PROFILES, generateMerchantTransactions } from './src/data/seedData';
 
@@ -54,9 +55,11 @@ app.post('/api/v1/assess-profile', async (req, res) => {
 
     const records = generateMerchantTransactions(profile.csv_key, 150);
     const sanitized = CrediFairComplianceGuard.sanitizeRecords(records);
+    const forensics = ForensicRiskGuard.analyzeLedgerForensics(records);
 
     const loanReq = loan_requested ? Number(loan_requested) : profile.loan_requested;
-    const risk = defaultEngine.predictRiskBand(profile.monthly_inflow, profile.volatility, profile.daily_tx);
+    const effectiveVolatility = Math.max(5.0, Math.min(95.0, profile.volatility + forensics.risk_penalty_points));
+    const risk = defaultEngine.predictRiskBand(profile.monthly_inflow, effectiveVolatility, profile.daily_tx);
 
     const explanation = await generateDualLanguageExplanation(
       profile.name,
@@ -78,16 +81,18 @@ app.post('/api/v1/assess-profile', async (req, res) => {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}`,
-        volatility: profile.volatility,
+        volatility: Math.round(effectiveVolatility * 10) / 10,
         daily_tx: profile.daily_tx,
         loan_requested: loanReq,
         total_records: records.length,
         active_days: 30,
         driver: profile.driver,
+        forensic_audit: forensics,
       },
       conformal_risk: risk,
       llm_explanation: explanation,
       sample_records: sanitized.slice(0, 10),
+      forensic_audit: forensics,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Failed to assess profile' });
@@ -95,7 +100,7 @@ app.post('/api/v1/assess-profile', async (req, res) => {
 });
 
 // 4. Analyze uploaded document (CSV / text)
-app.post('/api/v1/analyze', upload.single('file'), async (req, res) => {
+app.post('/api/v1/analyze', upload.single('file') as any, async (req, res) => {
   try {
     let content = '';
 
@@ -133,6 +138,7 @@ app.post('/api/v1/analyze', upload.single('file'), async (req, res) => {
       conformal_risk: risk,
       llm_explanation: explanation,
       sample_records: sanitizedRecords.slice(0, 10),
+      forensic_audit: vitals.forensic_audit,
     });
   } catch (err: any) {
     res.status(422).json({ error: err.message || 'Parsing error' });
