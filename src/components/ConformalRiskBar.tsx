@@ -170,7 +170,7 @@ export const ConformalRiskBar: React.FC<ConformalRiskBarProps> = ({ risk, forens
             }}
           >
             <span className="text-[10px] font-mono font-bold text-[#210F60] px-1 truncate">
-              [{lower.toFixed(1)}% — {upper.toFixed(1)}%]
+              [{lower.toFixed(1)}% to {upper.toFixed(1)}%]
             </span>
           </div>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShieldCheck,
@@ -22,10 +22,29 @@ import {
   ArrowUpRight,
   Check,
   Minus,
+  FileDown,
 } from 'lucide-react';
 import { BrandLogo } from '../components/BrandLogo';
+import { generateOperationalPdfReport } from '../utils/generatePdfReport';
 
 export const LandingPage: React.FC = () => {
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfSuccess, setPdfSuccess] = useState(false);
+
+  const handleDownloadPdf = () => {
+    setIsGeneratingPdf(true);
+    setTimeout(() => {
+      try {
+        generateOperationalPdfReport();
+        setPdfSuccess(true);
+        setTimeout(() => setPdfSuccess(false), 3500);
+      } catch (err) {
+        console.error('Failed to generate operational PDF report:', err);
+      } finally {
+        setIsGeneratingPdf(false);
+      }
+    }, 200);
+  };
   return (
     <div id="landing-page-root" className="min-h-screen bg-[#F8FBFF] text-[#210F60] font-sans pb-16">
       {/* 1. HERO SECTION - Modern Sleek Fintech Aesthetic */}
@@ -118,7 +137,7 @@ export const LandingPage: React.FC = () => {
                     ₦750,000.00
                   </div>
                   <div className="mt-3 pt-3 border-t border-white/15 flex items-center justify-between text-xs text-slate-200">
-                    <span>Conformal Risk Range: [2.2% — 8.4%]</span>
+                    <span>Conformal Risk Range: [2.2% to 8.4%]</span>
                     <span className="text-[#1DCF9F] font-bold">APPROVED</span>
                   </div>
                 </div>
@@ -236,7 +255,7 @@ export const LandingPage: React.FC = () => {
                 Traditional Commercial Underwriting vs. CrediFair AI
               </h2>
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                A granular, dimension-by-dimension assessment of how conventional banking frameworks systematically exclude high-velocity informal merchants—and how CrediFair AI resolves each bottleneck.
+                A granular, dimension-by-dimension assessment of how conventional banking frameworks systematically exclude high-velocity informal merchants, and how CrediFair AI resolves each bottleneck.
               </p>
             </div>
 
@@ -383,11 +402,44 @@ export const LandingPage: React.FC = () => {
 
           {/* Quick Comparison Data Matrix Table */}
           <div className="rounded-lg border border-slate-200 bg-[#F8FBFF] overflow-hidden">
-            <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-white">
-              <span className="text-sm font-bold text-[#210F60] uppercase tracking-wide">
-                Summary Operational Matrix
-              </span>
-              <span className="text-xs text-slate-500 font-medium">Feature-by-Feature Institutional Benchmark</span>
+            <div className="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-[#210F60] uppercase tracking-wide">
+                    Summary Operational Matrix
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#E4FFF8] text-[#006C51] border border-[#1DCF9F]/30">
+                    Institutional Benchmark
+                  </span>
+                </div>
+                <span className="text-xs text-slate-500 font-medium">Feature-by-Feature Institutional Benchmark Dossier</span>
+              </div>
+
+              <button
+                id="download-pdf-report-btn"
+                type="button"
+                onClick={handleDownloadPdf}
+                disabled={isGeneratingPdf}
+                title="Export current operational comparison as a branded executive PDF"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#210F60] hover:bg-[#2c167b] text-white text-xs font-bold transition-all shadow-xs hover:shadow-md active:scale-95 disabled:opacity-60 cursor-pointer shrink-0"
+              >
+                {isGeneratingPdf ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Generating PDF Dossier...</span>
+                  </>
+                ) : pdfSuccess ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-[#1DCF9F]" />
+                    <span>Report Downloaded!</span>
+                  </>
+                ) : (
+                  <>
+                    <FileDown className="w-4 h-4 text-[#1DCF9F]" />
+                    <span>Download PDF Report</span>
+                  </>
+                )}
+              </button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
@@ -411,7 +463,7 @@ export const LandingPage: React.FC = () => {
                   </tr>
                   <tr>
                     <td className="py-4 px-6 font-bold text-[#210F60] text-sm">Assessment Speed</td>
-                    <td className="py-4 px-6 text-slate-500">14 – 45 Days</td>
+                    <td className="py-4 px-6 text-slate-500">14 to 45 Days</td>
                     <td className="py-4 px-6 font-bold text-[#006C51]">Real-time (&lt; 3 Seconds)</td>
                   </tr>
                   <tr>
