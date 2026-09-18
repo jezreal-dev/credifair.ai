@@ -1,67 +1,59 @@
 # CrediFair AI: Algorithmic Credit Underwriting for Nigerian MSMEs
 
-Statistically calibrated, distribution-free conformal risk engine and statutory decision-support pipeline for underserved micro, small, and medium enterprises.
+Statistically calibrated, distribution-free conformal risk engine for underserved Nigerian enterprises. The pipeline provides certified uncertainty intervals and statutory decision support.
 
 ---
 
 ## 1. Submission Resources
 
-* Track: MIT Open Learning / 3MTT Universal AI Innovation Challenge
-* Project Name: CrediFair AI
-* Repository: https://github.com/jezreal-dev/credifair.ai
-* Live Demonstration: https://github.com/jezreal-dev/credifair.ai
-* Video Walkthrough: [Submission Video Placeholder]
-* Primary Developer: Jezreal Momoh (https://github.com/jezreal-dev)
-* Contact: dev@credifair.ai
+* **Track**: MIT Open Learning / 3MTT Universal AI Innovation Challenge.
+* **Project Name**: CrediFair AI.
+* **Repository**: https://github.com/jezreal-dev/credifair.ai
+* **Live Demo**: https://github.com/jezreal-dev/credifair.ai
+* **Video Walkthrough**: [Submission Video Placeholder].
+* **Primary Developer**: Jezreal Momoh (https://github.com/jezreal-dev).
+* **Contact**: dev@credifair.ai
 
 ---
 
 ## 2. Executive Summary
 
-In Nigeria, formal financial institutions systematically exclude micro, small, and medium enterprises (MSMEs) from unsecured debt facilities due to the absence of audited balance sheets, credit bureau histories, and conventional fixed-asset collateral. Commercial credit assessment engines rely on static scoring models that output overconfident point estimates, penalizing informal merchants whose revenues fluctuate with localized commodity seasonality.
+Nigerian banks exclude micro-merchants from credit due to missing collateral and balance sheets. Traditional scoring models output overconfident point estimates that penalize seasonal cashflow variance.
 
-CrediFair AI resolves this credit-rationing failure through distribution-free Inductive Conformal Prediction (ICP). The system ingests raw digital point-of-sale (POS) terminal records and commercial bank transaction statements, scrubs personal identifiers in volatile memory, and computes bounded default probability intervals at a certified 95% confidence level:
+CrediFair AI resolves credit rationing using distribution-free Inductive Conformal Prediction. The engine ingests POS ledgers, scrubs personal data, and yields valid 95% confidence intervals:
 
 $$P(Y \in [\hat{y}_{\text{lower}}, \hat{y}_{\text{upper}}]) \ge 1 - \alpha \quad (\alpha = 0.05)$$
 
-The pipeline bridges predictive mathematics and operational compliance by enforcing human-in-the-loop authorization under Section 37 of the Nigeria Data Protection Act (NDPA) 2023, generating verifiable SHA-256 cryptographic audit manifests, and generating actionable dual-language explainability outputs in formal English and Nigerian Pidgin.
+The system enforces human oversight under NDPA 2023 Section 37 via tamper-evident SHA-256 audit manifests. It also generates dual-language explanations in formal English and Nigerian Pidgin.
 
 ---
 
 ## 3. Hackathon Rubric Alignment
 
 ### 3.1 Problem and Market Impact
-* Total Addressable Market (TAM): Over 39.6 million MSMEs operate in Nigeria, representing approximately 96% of registered commercial enterprises and contributing over 48% to the national Gross Domestic Product (GDP).
-* Financing Gap: The International Finance Corporation (IFC) and Central Bank of Nigeria (CBN) identify an annual credit gap exceeding $32 billion for formal and informal micro-enterprises.
-* Operational Bottleneck: Over 90% of Nigerian micro-merchants operate via daily cash-inflow channels (such as OPay, Moniepoint, PalmPay, and commercial merchant accounts) rather than formal audited books. Traditional bureau scoring categorizes them as unrateable or subprime, resulting in predatory credit terms or total credit denial.
-* Economic Value: CrediFair AI qualifies solvent, high-velocity informal businesses using cashflow variance and transaction density, establishing an empirical bridge to working-capital facilities.
+* **Market Scope**: Over 39.6 million Nigerian MSMEs drive 48% of GDP but lack access to formal credit markets.
+* **Credit Gap**: The IFC and Central Bank of Nigeria document an annual MSME financing shortfall exceeding $32 billion.
+* **Data Exclusion**: Over 90% of informal merchants rely on digital POS flows rather than audited books, leaving them unrated by bureaus.
+* **Economic Bridge**: CrediFair AI qualifies solvent merchants using transaction density, opening working-capital access.
 
 ### 3.2 Technical Rigor and Mathematical Depth
-* Base Predictive Regressor: Gradient-boosted decision trees (`XGBRegressor`) trained on non-mocked transactional indicators (monthly inflow volume, transaction frequency, and coefficient of variation).
-* Inductive Conformal Prediction (ICP): Implemented via `MapieRegressor` to compute non-conformity scores without making parametric distributional assumptions regarding underlying cashflow distributions.
-* Three-Way Partitioning Protocol:
-  * Training Split (60%): Optimizes base regressor parameter weights.
-  * Calibration Split (20%): Computes non-conformity residuals to establish exact conformal quantile thresholds ($q_{\text{val}}$) while preserving exchangeability.
-  * Holdout Evaluation Split (20%): Evaluates empirical marginal coverage guarantees on unseen merchant data.
-* Finite-Sample Statistical Coverage: Guarantees finite-sample coverage at significance level $\alpha = 0.05$:
-  * If empirical coverage drops below 95%, interval widths expand automatically to account for high revenue volatility.
-  * Eliminates false certainty from single-point default probabilities.
+* **Predictive Model**: Gradient-boosted trees (XGBRegressor) estimate default probabilities from empirical transaction signals.
+* **Distribution-Free ICP**: Implemented via MapieRegressor to bound risk without assuming normal cashflow distributions.
+* **Data Partitioning**: 60% training, 20% calibration, and 20% holdout testing preserves strict data exchangeability.
+* **Coverage Guarantee**: Certified 95% marginal coverage (alpha = 0.05) expands intervals during volatile periods.
+* **Uncertainty Bound**: Replaces overconfident single-point estimates with honest mathematical risk intervals.
 
 ### 3.3 Responsible AI, Regulatory Compliance, and Security
-* NDPA 2023 Section 37 Statutory Mandate: Purely automated credit granting is programmatically blocked. Model outputs function strictly as decision-support indicators. Final approval or decline requires a designated loan officer to review metrics and submit supervisory sign-off.
-* Cryptographic Audit Logs: Every loan evaluation generates a canonical RFC 8785 JSON manifest sealed with a SHA-256 digest encompassing applicant metrics, conformal intervals, underwriting recommendation, officer credential, and UTC timestamp.
-* In-Memory PII Scrubbing (NDPA 2023 Section 24): Ingestion pipelines run regex scrubbers in volatile memory prior to feature computation or model evaluation, stripping 11-digit Bank Verification Numbers (BVN), National Identification Numbers (NIN), telephone numbers, and email addresses. Raw customer identifiers are never saved to disk or transmitted to language models.
-* Application Security Hardening:
-  * Resource Depletion Defense (CWE-400): Maximum 5MB payload ceiling enforced at the API gateway layer.
-  * CSV Injection Prevention (CWE-1236): Strips executable formula triggers (`=`, `+`, `-`, `@`, `|`) from ledger export files.
-  * Prompt Injection Filtering (OWASP LLM01): Strips prompt-override delimiters and instruction injections before external LLM calls.
-* Forensic Pattern Integrity: Transaction analysis module inspects ledgers for artificial round-sum clustering, wash trading, two-day turnover concentration spikes (>65% volume), and dormancy velocity deficits.
+* **Statutory Compliance**: NDPA 2023 Section 37 blocks automated lending, requiring designated human underwriter sign-off.
+* **Cryptographic Auditing**: Generates RFC 8785 canonical manifests sealed with SHA-256 digests over metrics and decisions.
+* **Privacy Protection**: In-memory regex scrubbers mask 11-digit BVNs, NINs, phone numbers, and emails per NDPA Section 24.
+* **Application Security**: Enforces 5MB limits (CWE-400), blocks formula injection (CWE-1236), and filters prompt injections.
+* **Forensic Detection**: Algorithms identify wash trading, circular transfers, and sudden 48-hour volume concentration spikes.
 
 ### 3.4 Usability, Explainability, and Localization
-* Dual Output Formatting:
-  * Credit Officer Audit Report (Formal English): Explicit financial risk profile detailing liquidity ratios, cashflow variance, debt-service coverage, and conformal interval interpretation.
-  * Merchant Advisory (Nigerian Pidgin): Actionable vernacular translation breaking down turnover realities, seasonal volatility, and debt-servicing limits without financial jargon.
-* Actionable Recourse: Rather than issuing uninformative rejections, adverse explanations explicitly identify the triggering financial vitals (such as turnover drop or excessive withdrawal frequency) and prescribe quantitative improvements required for future qualification.
+* **Officer Reports**: Formal English summaries detail liquidity ratios, volatility metrics, and debt-service bounds.
+* **Merchant Guidance**: Nigerian Pidgin advisories translate financial metrics into practical cashflow recommendations.
+* **Actionable Recourse**: Adverse decisions specify exact metric triggers and prescribe concrete steps for re-application.
 
 ---
 
@@ -69,12 +61,11 @@ The pipeline bridges predictive mathematics and operational compliance by enforc
 
 ![CrediFair AI Architectural Data Flow](assets/architecture_data_flow.svg)
 
-
 ---
 
 ## 5. Decision Routing Thresholds
 
-Underwriting recommendations depend strictly on the upper bound ($\hat{y}_{\text{upper}}$) of the 95% conformal prediction interval:
+Underwriting recommendations depend strictly on the upper risk bound of the 95% conformal interval. This three-tier matrix guides credit committee decisions:
 
 | Conformal Interval Upper Bound | Underwriting Determination | Operational Routing Action |
 | :--- | :--- | :--- |
@@ -115,12 +106,12 @@ credifair-ai/
 ## 7. Installation and Quickstart
 
 ### Prerequisites
-* Operating System: Linux or Windows Subsystem for Linux (WSL2 Ubuntu)
-* Python Environment: Python 3.10, 3.11, or 3.12
+* **Supported OS**: Linux or Windows Subsystem for Linux (WSL2 Ubuntu).
+* **Python Runtime**: Python 3.10, 3.11, or 3.12.
 
 ### Step 1: Environment Setup
 ```bash
-git clone https://github.com/jezreal-dev/credifair.ai.git
+git clone https://github.com/jezreal-dev/credifair.ai.git credifair-ai
 cd credifair-ai
 
 python3 -m venv venv
@@ -134,7 +125,7 @@ pip install --no-cache-dir -r requirements.txt
 ```
 
 ### Step 3: API Key Configuration (Optional)
-Configure an environment file for live cloud language model routing:
+Configure an environment file for optional live cloud language model routing. When omitted, the engine defaults to deterministic offline explanations without interruption:
 ```bash
 cat << 'EOF' > .env
 GROQ_API_KEY=your_groq_api_key_here
@@ -142,23 +133,21 @@ GEMINI_API_KEY=your_gemini_api_key_here
 FIREWORKS_API_KEY=your_fireworks_api_key_here
 EOF
 ```
-*Note: If API keys are omitted, the engine defaults automatically to internal deterministic rule-based explanations with zero service interruption.*
 
 ### Step 4: Launch Services
+Launch backend and frontend services using the commands below. Each component runs independently to support automated audits or visual underwriting:
 
-* Launch Headless FastAPI REST Server:
+* **REST API**: Launch FastAPI at port 8000 with interactive docs at `http://localhost:8000/docs`.
 ```bash
 uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
-Interactive API documentation is accessible at `http://localhost:8000/docs`.
 
-* Launch Streamlit Verification Dashboard:
+* **Dashboard**: Launch the Streamlit underwriting review application at `http://localhost:8501`.
 ```bash
 streamlit run app.py
 ```
-Dashboard is accessible at `http://localhost:8501`.
 
-* Execute Live CLI Statement Audit:
+* **CLI Audit**: Execute a live statement audit against sample merchant transactions.
 ```bash
 python run_live_audit.py --file sample_bodija_market_statement.csv --merchant-name "Bodija Retail Archetype"
 ```
@@ -167,7 +156,10 @@ python run_live_audit.py --file sample_bodija_market_statement.csv --merchant-na
 
 ## 8. Verified Test Suite Output
 
-Execution of automated unit and integration tests confirming full verification across statistical coverage, API contracts, security sanitization, and forensics:
+Automated test suites confirm end-to-end system integrity across all modules. All 19 unit and integration tests pass consistently.
+
+<details>
+<summary>Click to inspect passing pytest execution log (19 passed)</summary>
 
 ```text
 ============================= test session starts ==============================
@@ -200,15 +192,14 @@ tests/test_forensics.py::test_api_integration_preserves_contract PASSED  [100%]
 ======================== 19 passed, 1 warning in 5.63s =========================
 ```
 
+</details>
+
 ---
 
 ## 9. Standards and Licensing
 
-* Regulatory Frameworks:
-  * Nigeria Data Protection Act (NDPA) 2023: Section 37 (Automated Decisions) and Section 24 (Data Minimization).
-  * National Information Technology Development Agency (NITDA): Ethical Artificial Intelligence Principles.
-* Application Security Frameworks:
-  * OWASP Top 10: CWE-400 (Denial of Service), CWE-434 (Unrestricted Upload), CWE-1236 (Formula Injection).
-  * OWASP LLM Top 10: Mitigation of LLM01 (Prompt Injection) and LLM06 (Sensitive Information Disclosure).
-* Cryptographic Specifications: Canonical JSON formatting per RFC 8785, cryptographic digests per FIPS 180-4 (SHA-256).
-* License: Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for full legal text.
+* **Regulatory Laws**: Conforms to NDPA 2023 Section 37 (Automated Decisions) and Section 24 (Data Minimization).
+* **Ethical Guidance**: Adheres to NITDA Ethical AI principles for algorithmic transparency and traceability.
+* **Application Security**: Implements OWASP Top 10 defenses for CWE-400, CWE-1236, and OWASP LLM01 injection.
+* **Cryptographic Standards**: Follows RFC 8785 canonical JSON formatting and FIPS 180-4 SHA-256 digital seals.
+* **Open Source License**: Distributed under the Apache License, Version 2.0 terms. Refer to LICENSE for details.
