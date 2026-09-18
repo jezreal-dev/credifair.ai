@@ -11,7 +11,7 @@ Statistically calibrated, distribution-free conformal risk engine for underserve
 * **Repository**: https://github.com/jezreal-dev/credifair.ai
 * **Live Demo**: https://credifair.ai.studio/
 * **Video Walkthrough**: [Submission Video Placeholder].
-* **Developer**: Jezreal Momoh.
+* **Developer**: [Jezreal Momoh](https://www.linkedin.com/in/jezreal-momoh/).
 
 ---
 
