@@ -1,0 +1,6 @@
+{
+  "name": "CrediFair AI",
+  "description": "Fair alternative credit scoring with conformal risk intervals, NDPA 2023 §37 compliance, and dual-language underwriting for Nigerian MSMEs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
